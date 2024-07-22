@@ -31,11 +31,11 @@ function fakescript()
 	local larmcf = Vector3.new(0,0,0)
 	local copy = toclipboard or setclipboard
 
-	function alert(title,desc)
+	function alert(title,desc,dur)
 		game:GetService("StarterGui"):SetCore("SendNotification", {
 			Title = title;
 			Text = desc;
-			Duration = 5;
+			Duration = dur;
 		})
 	end
 	
@@ -108,11 +108,7 @@ function fakescript()
 		Player.Character = Player.Character
 	end
 
-	if copy == nil then
-		alert("Exploit not supported!","Copying to clipboard is not avaliable in your exploit.")
-		error("Copying to clipboard is not avaliable in your exploit.")
-		return
-	end
+	alert("Disclaimer","This GUI is intended to be ran on Solara and Wave, but the VR script will only work on Celery and Wave.")
 	
 	function updateList()
 		for i,v in ipairs(Selection:GetChildren()) do if v.Name ~= "Temp" and v:IsA("Frame") then v:Destroy() end end
