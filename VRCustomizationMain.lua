@@ -110,6 +110,8 @@ function fakescript()
 
 	if copy == nil then
 		alert("Exploit not supported!","Copying to clipboard is not avaliable in your exploit.")
+		error("Copying to clipboard is not avaliable in your exploit.")
+		return
 	end
 	
 	function updateList()
