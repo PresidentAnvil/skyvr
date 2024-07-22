@@ -31,12 +31,14 @@ function fakescript()
 	local larmcf = Vector3.new(0,0,0)
 	local copy = toclipboard or setclipboard
 
-	if not Character then
-		Player.CharacterAdded:Wait()
-		Player.CharacterAdded:Wait()
-		Player.Character = Player.Character
+	function alert(title,desc)
+		game:GetService("StarterGui"):SetCore("SendNotification", {
+			Title = title;
+			Text = desc;
+			Duration = 5;
+		})
 	end
-
+	
 	function ifind(t,a)
 		for i,v in pairs(t) do
 			if i==a then
@@ -101,6 +103,15 @@ function fakescript()
 		end
 	end
 
+	if not Character then
+		Player.CharacterAdded:Wait()
+		Player.Character = Player.Character
+	end
+
+	if copy == nil then
+		alert("Exploit not supported!","Copying to clipboard is not avaliable in your exploit.")
+	end
+	
 	function updateList()
 		for i,v in ipairs(Selection:GetChildren()) do if v.Name ~= "Temp" and v:IsA("Frame") then v:Destroy() end end
 
