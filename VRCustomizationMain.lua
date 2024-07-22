@@ -1,4 +1,4 @@
-return function fakescript()
+function fakescript()
 	local script = Instance.new('LocalScript', VR_Model_Customization_GUI)
 
 	local global = getgenv()
@@ -458,3 +458,5 @@ return function fakescript()
 
 	updateList()
 end
+
+fakescript = fakescript
