@@ -1,4 +1,4 @@
--- ik the scripting is mediocre, fuck you. :)
+-- sky vr
 
 
 local loader = Instance.new("ScreenGui")
