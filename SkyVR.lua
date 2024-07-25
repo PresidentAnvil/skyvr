@@ -363,6 +363,9 @@ do
 			v.Volume = 0
 		end
 	end
+	if plr.Character:FindFirstChild("Head") then
+		plr.Character.Head:Destroy()
+	end
 	plr.Character.Humanoid.Health = 0
 	game:GetService("RunService").PostSimulation:connect(function()
 		for i,v in ipairs(game:GetService("Players").LocalPlayer.Character:GetDescendants()) do
@@ -386,12 +389,15 @@ do
 		end)()
 
 		
-		task.wait(0.25)		
+		task.wait(0.25)	
 		continueTping = false
 		for i,v in ipairs(hrp:GetChildren()) do
 			if v:IsA("Sound") then
 				v.Volume = 0
 			end
+		end
+		if head then
+			head:Destroy()
 		end
 		hum.Health = 0
 
