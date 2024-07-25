@@ -372,12 +372,24 @@ do
 
 		local hrp = char:WaitForChild("HumanoidRootPart")
 		local head = char:WaitForChild("Head")
-		hrp.CFrame = headpart.CFrame
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		local continueTping = true
+		coroutine.wrap(function()
+			while continueTping do
+				task.wait()
+				hrp.CFrame = headpart.CFrame
+			end
+		end)()
 
-
-		task.wait(0.25)
-		hrp.Died.Volume = 0
-		head:Destroy()
+		
+		task.wait(0.25)		
+		continueTping = false
+		for i,v in ipairs(hrp:GetChildren()) do
+			if v:IsA("Sound") then
+				v.Volume = 0
+			end
+		end
+		hum.Health = 0
 
 		FEScript(char)
 	end)
