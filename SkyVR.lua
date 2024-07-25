@@ -358,8 +358,12 @@ end
 
 
 do
-	plr.Character.HumanoidRootPart.Died.Volume = 0
-	plr.Character.Head:Destroy()
+	for i,v in ipairs(plr.Character.HumanoidRootPart:GetChildren()) do
+		if v:IsA("Sound") then
+			v.Volume = 0
+		end
+	end
+	plr.Character.Humanoid.Health = 0
 	game:GetService("RunService").PostSimulation:connect(function()
 		for i,v in ipairs(game:GetService("Players").LocalPlayer.Character:GetDescendants()) do
 			if v:IsA("BasePart") and v.Name ~="HumanoidRootPart" then 
