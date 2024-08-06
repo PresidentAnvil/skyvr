@@ -1,4 +1,6 @@
 function fakescript()
+	local script = Instance.new('LocalScript', VR_Model_Customization_GUI)
+	
 	local global = getgenv()
 	global.skyvrsettings = {
 		headhats = {},
