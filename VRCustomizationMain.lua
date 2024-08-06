@@ -108,7 +108,7 @@ function fakescript()
 		Player.Character = Player.Character
 	end
 
-	alert("Disclaimer","This GUI is intended to be ran on Solara and Wave, but the VR script will only work on Celery and Wave.")
+	alert("Disclaimer","This GUI is intended to be ran on Solara and Wave, but the VR script will only work on Celery and Wave.",999)
 	
 	function updateList()
 		for i,v in ipairs(Selection:GetChildren()) do if v.Name ~= "Temp" and v:IsA("Frame") then v:Destroy() end end
