@@ -16,7 +16,8 @@ function fakescript()
 	local Settings = script.Parent.Settings
 	local ExtraSettings = script.Parent.ExtraSettings
 	local Export = script.Parent.Export
-	local Preview = script.Parent.PreviewFrame.Viewport
+	local PreviewLimbs = script.Parent.the
+	local PreviewHatsFolder = script.Parent.hats
 	--------------------------------------------
 	local Tabs = MainFrame.Tabs.ScrollingFrame
 	local Selection = MainFrame.Selection.ScrollingFrame
@@ -103,6 +104,9 @@ function fakescript()
 			return tostring(o)
 		end
 	end
+	
+	PreviewLimbs.Parent = workspace
+	PreviewHatsFolder.Parent = workspace
 	
 	if not Character then
 		Player.CharacterAdded:Wait()
@@ -308,6 +312,11 @@ function fakescript()
 	Export.x.MouseButton1Click:Connect(function()
 		Export.Visible = false
 	end)
+
+	MainFrame.Hide.MouseButton1Click:Connect(function()
+		alert("UI Hidden", "Press F to make the UI reappear.",10)
+		MainFrame.Visible = false
+	end)
 	
 	Settings.x.MouseButton1Click:Connect(function()
 		Settings.Visible = false
@@ -400,21 +409,23 @@ function fakescript()
 	
 	game:GetService("RunService").RenderStepped:Connect(function()
 		local accessoriesActive = {}
-	
+		
+		PreviewLimbs:SetPrimaryPartCFrame(CFrame.new(Player.Character.HumanoidRootPart.Position)*CFrame.new(0,7,5))
+			
 		for i,v in pairs(global.skyvrsettings.headhats) do
-			if Preview:FindFirstChild(i) then 
-				local handleClone = Preview[i]
-	
-				handleClone.CFrame = Preview.head.CFrame * v
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+	            handleClone:BreakJoints()
+				handleClone.CFrame = PreviewLimbs.head.CFrame * v
 				accessoriesActive[i]=1
 			else
 				local accessory = findMeshID(Character,i)
 				local handleClone = accessory.Handle:Clone()
-	
-				handleClone.Parent = Preview
+	            handleClone:BreakJoints()
+				handleClone.Parent = PreviewHatsFolder
 				handleClone.Name = i
 				handleClone.Anchored = true
-				handleClone.CFrame = Preview.head.CFrame * v
+				handleClone.CFrame = PreviewLimbs.head.CFrame * v
 				accessoriesActive[i]=1
 			end
 		end
@@ -423,50 +434,58 @@ function fakescript()
 	
 		if global.skyvrsettings.leftarm ~= "" then
 			local i = global.skyvrsettings.leftarm
-			if Preview:FindFirstChild(i) then 
-				local handleClone = Preview[i]
-	
-				handleClone.CFrame = Preview.larm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+	            handleClone:BreakJoints()
+				handleClone.CFrame = PreviewLimbs.larm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
 				accessoriesActive[i]=1
 			else
 				local accessory = findMeshID(Character,i)
 				local handleClone = accessory.Handle:Clone()
-	
-				handleClone.Parent = Preview
+	            handleClone:BreakJoints()
+				handleClone.Parent = PreviewHatsFolder
 				handleClone.Name = i
 				handleClone.Anchored = true
-				handleClone.CFrame = Preview.larm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
+				handleClone.CFrame = PreviewLimbs.larm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
 				accessoriesActive[i]=1
 			end
 		end
 	
 		if global.skyvrsettings.rightarm ~= "" then
 			local i = global.skyvrsettings.rightarm
-			if Preview:FindFirstChild(i) then 
-				local handleClone = Preview[i]
-	
-				handleClone.CFrame = Preview.rarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+	            handleClone:BreakJoints()
+				handleClone.CFrame = PreviewLimbs.rarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
 				accessoriesActive[i]=1
 			else
 				local accessory = findMeshID(Character,i)
 				local handleClone = accessory.Handle:Clone()
-	
-				handleClone.Parent = Preview
+	            handleClone:BreakJoints()
+				handleClone.Parent = PreviewHatsFolder
 				handleClone.Name = i
 				handleClone.Anchored = true
-				handleClone.CFrame = Preview.rarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
+				handleClone.CFrame = PreviewLimbs.rarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
 				accessoriesActive[i]=1
 			end
 		end
 	
 	
 	
-		for i,v in ipairs(Preview:GetChildren()) do
+		for i,v in ipairs(PreviewHatsFolder:GetChildren()) do
 			if v.Name:find('meshid:') then
 				if not ifind(accessoriesActive,v.Name) then
 					v:Destroy()
 				end
 			end
+		end
+	end)
+
+	game:GetService("UserInputService").InputBegan:Connect(function(input,gpe)
+		if gpe then return end
+			
+		if input.KeyCode == Enum.KeyCode.F then
+			MainFrame.Visible = true
 		end
 	end)
 	
