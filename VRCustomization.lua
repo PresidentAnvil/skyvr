@@ -1,3 +1,4 @@
+-- DO NOT RUN THIS IN VR MODE
 skyvrversion = '2.0.0'
 
 VR_Model_Customization_GUI = game:GetObjects("rbxassetid://18952348863")[1]
