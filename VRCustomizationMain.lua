@@ -13,6 +13,7 @@ function fakescript()
 	local Character = Player.Character
 	--------------------------------------------
 	local MainFrame = script.Parent.MainFrame
+    	local Preview = script.Parent.PreviewFrame.Viewport
 	local Settings = script.Parent.Settings
 	local ExtraSettings = script.Parent.ExtraSettings
 	local Export = script.Parent.Export
@@ -32,7 +33,8 @@ function fakescript()
 	local rarmcf = Vector3.new(0,0,0)
 	local larmcf = Vector3.new(0,0,0)
 	local copy = toclipboard or setclipboard
-	
+	local camera = Instance.new("Camera")
+
 	function alert(title,desc,dur)
 		game:GetService("StarterGui"):SetCore("SendNotification", {
 			Title = title;
@@ -40,7 +42,7 @@ function fakescript()
 			Duration = dur;
 		})
 	end
-	
+	Preview.Parent.Visible=true
 	function ifind(t,a)
 		for i,v in pairs(t) do
 			if i==a then
@@ -104,10 +106,7 @@ function fakescript()
 			return tostring(o)
 		end
 	end
-	
-	PreviewLimbs.Parent = workspace
-	PreviewHatsFolder.Parent = workspace
-	
+
 	if not Character then
 		Player.CharacterAdded:Wait()
 		Character = Player.Character
@@ -193,6 +192,7 @@ function fakescript()
 				end)
 			end
 	
+			newButton.Error.TextLabel.Text = "Already used in: Arm Hats"
 			if currentPage == "armhats" then
 				if ifind(global.skyvrsettings.headhats, 'meshid:'..MeshId) then
 					newButton.Error.TextLabel.Text = "Already used in: Head Hats"
@@ -380,7 +380,7 @@ function fakescript()
 		local ldonething = 'Vector3.new('..s(larmcf)..')'
 		local rdonething = 'Vector3.new('..s(rarmcf)..')'
 	
-		local generatedScript = 'getgenv().headhats = '..dump(headhats)..'\ngetgenv().right = "'..configs.rightarm..'"\ngetgenv().left = "'..configs.leftarm..'"\ngetgenv().options = {\noutlinesEnabled = false, -- buggy-ish\nrighthandrotoffset = '..rdonething..', -- rotation is fit for the phantom right hand accessory\nlefthandrotoffset = '..ldonething..', -- rotation is fit for the phantom left hand accessory\nheadscale = 3,\nNetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers\ncontrollerRotationOffset = Vector3.new(90,90,0), -- movement offset\nHeadHatTransparency = 1,\nthirdPersonButtonToggle = nil, -- see what you look like (EXPERIMENTAL, set it to Enum.KeyCode.ButtonA if you want)\nleftToyBind = Enum.KeyCode.ButtonY, -- :D\nrightToyBind = Enum.KeyCode.ButtonB, -- :D\nleftToy = "'..configs.toyhats.leftarm..'", -- default is "" or nil\nrightToy = "'..configs.toyhats.rightarm..'", -- default is "" or nil\n}\ngetgenv().skyVRversion = \''..skyvrversion..'\'\nloadstring(game:HttpGet(\'https://raw.githubusercontent.com/loadlua/skyvr/main/SkyVR.lua\'))();'
+		local generatedScript = 'getgenv().headhats = '..dump(headhats)..'\ngetgenv().right = "'..configs.rightarm..'"\ngetgenv().left = "'..configs.leftarm..'"\ngetgenv().options = {\noutlinesEnabled = false, -- buggy-ish\nrighthandrotoffset = '..rdonething..', -- rotation is fit for the phantom right hand accessory\nlefthandrotoffset = '..ldonething..', -- rotation is fit for the phantom left hand accessory\nheadscale = 3,\nNetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers\ncontrollerRotationOffset = Vector3.new(90,90,0), -- movement offset\nHeadHatTransparency = 1,\nthirdPersonButtonToggle = nil, -- see what you look like (EXPERIMENTAL, set it to Enum.KeyCode.ButtonA if you want)\nleftToyBind = Enum.KeyCode.ButtonY, -- :D\nrightToyBind = Enum.KeyCode.ButtonB, -- :D\nleftToy = "'..configs.toyhats.leftarm..'", -- default is "" or nil\nrightToy = "'..configs.toyhats.rightarm..'", -- default is "" or nil\n}\ngetgenv().skyVRversion = \''..skyvrversion..'\'\nloadstring(game:HttpGet(\'https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVR.lua\'))();'
 	
 		Export.Visible = true
 		Export.Script.Text = generatedScript
@@ -400,7 +400,6 @@ function fakescript()
 	ExtraSettings.Selection.rcfrot.FocusLost:Connect(function()
 		local split = string.split(ExtraSettings.Selection.rcfrot.Text,',')
 		if #split == 3 then
-			print(Vector3.new(unpack(split)))
 			rarmcf = Vector3.new(unpack(split))
 		else
 			ExtraSettings.Selection.rcfrot.Text = '0,0,0'
@@ -410,7 +409,7 @@ function fakescript()
 	game:GetService("RunService").RenderStepped:Connect(function()
 		local accessoriesActive = {}
 		
-		PreviewLimbs:SetPrimaryPartCFrame(CFrame.new(Player.Character.HumanoidRootPart.Position)*CFrame.new(0,7,5))
+		--PreviewLimbs:SetPrimaryPartCFrame(CFrame.new(Player.Character.HumanoidRootPart.Position)*CFrame.new(0,7,5))
 			
 		for i,v in pairs(global.skyvrsettings.headhats) do
 			if PreviewHatsFolder:FindFirstChild(i) then 
@@ -455,13 +454,13 @@ function fakescript()
 			local i = global.skyvrsettings.rightarm
 			if PreviewHatsFolder:FindFirstChild(i) then 
 				local handleClone = PreviewHatsFolder[i]
-	            handleClone:BreakJoints()
+					
 				handleClone.CFrame = PreviewLimbs.rarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
 				accessoriesActive[i]=1
 			else
 				local accessory = findMeshID(Character,i)
 				local handleClone = accessory.Handle:Clone()
-	            handleClone:BreakJoints()
+					
 				handleClone.Parent = PreviewHatsFolder
 				handleClone.Name = i
 				handleClone.Anchored = true
@@ -488,8 +487,20 @@ function fakescript()
 			MainFrame.Visible = true
 		end
 	end)
-	
+    
+	PreviewLimbs.Parent = Preview
+	PreviewHatsFolder.Parent = Preview
+    	Preview.CurrentCamera = camera
+    	camera.CFrame = CFrame.new(-28.55,4,8) * CFrame.Angles(0,math.pi,0)
+    	camera.Focus = CFrame.new(-28.698, 3.226, 11.112)
+    	camera.HeadLocked = true
+    	camera.CameraType = "Fixed"
+    	camera.DiagonalFieldOfView = 88.877
+    	camera.FieldOfView = 70
+    	camera.FieldOfViewMode = "Vertical"
+    	camera.MaxAxisFieldOfView = 70
+
 	updateList()
 end
 
-fakescript = fakescript
+fakescript()
