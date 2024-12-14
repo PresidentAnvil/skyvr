@@ -2,25 +2,7 @@
 cfn=CFrame.new
 cfa=CFrame.Angles
 r=math.rad
-getgenv().headhats = { ["meshid:81504052"] = CFrame.new(0, 0, 0),["meshid:4819720316"] = CFrame.new(0, -2, 0),} 
-getgenv().right = "meshid:81642452"
-getgenv().left = "meshid:83293901"
-getgenv().options = {
-    dontfling = false,
-    outlinesEnabled = false, -- buggy-ish
-    righthandrotoffset = Vector3.new(0, 0, 0), -- rotation is fit for the phantom right hand accessory
-    lefthandrotoffset = Vector3.new(0, 0, 0), -- rotation is fit for the phantom left hand accessory
-    headscale = 3,
-    NetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers
-    controllerRotationOffset = Vector3.new(180,180,0), -- movement offset
-    HeadHatTransparency = 1,
-    thirdPersonButtonToggle = nil, -- see what you look like (EXPERIMENTAL, set it to Enum.KeyCode.ButtonA if you want)
-    leftToyBind = Enum.KeyCode.ButtonY, -- :D
-    rightToyBind = Enum.KeyCode.ButtonB, -- :D
-    leftToy = "meshid:319354652", -- default is "" or nil
-    rightToy = "meshid:17858522136", -- default is "" or nil
-}
-getgenv().skyVRversion = '2.0.0'
+
 local function createpart(size, name,h)
 	local Part = Instance.new("Part")
 	Part.Parent = workspace
@@ -219,7 +201,7 @@ end)
 HatdropCallback(Player.Character, function(allhats)
     for i,v in pairs(allhats) do
         if not v[1]:FindFirstChild("Handle") then continue end
-        if v[2]=="headhats" then v[1].Handle.Transparency = 1 end
+        if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
         Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]]["meshid:"..v[3]])or CFrame.new())
     end
@@ -230,7 +212,7 @@ getgenv().conn = Player.CharacterAdded:Connect(function(Character)
     HatdropCallback(Player.Character, function(allhats)
         for i,v in pairs(allhats) do
             if not v[1]:FindFirstChild("Handle") then continue end
-            if v[2]=="headhats" then v[1].Handle.Transparency = 1 end
+            if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
             Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]]["meshid:"..v[3]])or CFrame.new())
         end
