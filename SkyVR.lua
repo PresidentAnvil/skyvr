@@ -1,5 +1,8 @@
 -- sky vr
-
+if getgenv().HATDROP then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/loadlua/skyvr/main/SkyVRHatdrop.lua"))()
+	return
+end
 
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
@@ -396,10 +399,7 @@ do
 				v.Volume = 0
 			end
 		end
-		if head then
-			head:Destroy()
-		end
-		hum.Health = 0
+		hum:ChangeState(15)
 
 		FEScript(char)
 	end)
@@ -411,13 +411,11 @@ task.delay(5,function()
 end)
 
 -- vr handler starts here
-coroutine.wrap(function()
-	local cam = workspace.CurrentCamera
-	cam:GetPropertyChangedSignal("CFrame"):Connect(function()
-		cam.CameraType = "Scriptable"
-		cam.HeadScale = global.options.headscale
-	end)
-end)()
+local cam = workspace.CurrentCamera
+cam:GetPropertyChangedSignal("CFrame"):Connect(function()
+	cam.CameraType = "Scriptable"
+	cam.HeadScale = global.options.headscale
+end)
 local cam = workspace.CurrentCamera
 
 cam.CameraType = "Scriptable"
