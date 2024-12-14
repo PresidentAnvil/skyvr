@@ -123,7 +123,7 @@ function HatdropCallback(Character, callback)
         v[1].Handle:BreakJoints()
         local con;con=ps:Connect(function()
             if not v[1]:FindFirstChild"Handle" then con:Disconnect() return end
-            v[1].Handle.Velocity = ((options.dontfling == false and v[2]:find("Toy") == true) and Vector3.new(99999,99999,99999)) or Vector3.new(20,20,20)
+            v[1].Handle.Velocity = ((options.dontfling ~= false and v[2]:find("Toy") == true) and Vector3.new(99999,99999,99999)) or Vector3.new(20,20,20)
             v[1].Handle.RotVelocity = Vector3.zero
         end)
     end
