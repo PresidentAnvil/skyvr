@@ -60,6 +60,17 @@ function findMeshID(id)
     return false
 end
 
+function findHatName(id)
+    for i,v in pairs(getgenv().headhats) do
+        if i==id then return true,"headhats" end
+    end
+    if getgenv().right==id then return true,"right" end
+    if getgenv().left==id then return true,"left" end
+    if options.leftToy==id then return true,"leftToy" end
+    if options.rightToy==id then return true,"rightToy" end
+    return false
+end
+
 function Align(Part1,Part0,cf,isflingpart) 
     local up = isflingpart
     local con;con=ps:Connect(function()
@@ -80,6 +91,9 @@ function getAllHats(Character)
         local is,d = findMeshID(filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId))
         if is then
             table.insert(allhats,{v,d,filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)})
+        else
+            local is,d = findHatName(v.Name)
+            table.insert(allhats,{v,d,v.Name})
         end
     end
     return allhats
@@ -214,7 +228,7 @@ getgenv().conn = Player.CharacterAdded:Connect(function(Character)
             if not v[1]:FindFirstChild("Handle") then continue end
             if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-            Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]]["meshid:"..v[3]])or CFrame.new())
+            Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][( (v[3]:find("meshid:") and "meshid:"..v[3]) or v[3] )])or CFrame.new())
         end
     end)
 end)
