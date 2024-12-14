@@ -159,9 +159,6 @@ end
 
 local cam = workspace.CurrentCamera
 
-cam.CameraType = "Scriptable"
-cam.HeadScale = options.headscale
-
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 
 input.UserCFrameChanged:connect(function(part,move)

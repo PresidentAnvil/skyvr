@@ -412,36 +412,26 @@ end)
 
 -- vr handler starts here
 local cam = workspace.CurrentCamera
-cam:GetPropertyChangedSignal("CFrame"):Connect(function()
-	cam.CameraType = "Scriptable"
-	cam.HeadScale = global.options.headscale
-end)
-local cam = workspace.CurrentCamera
-
-cam.CameraType = "Scriptable"
-cam.HeadScale = global.options.headscale
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 
 input.UserCFrameChanged:connect(function(part,move)
 	cam.CameraType = "Scriptable"
 	cam.HeadScale = global.options.headscale
-    pcall(function()
-    	if part == Enum.UserCFrame.Head then
-    		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
-			thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
-    	elseif part == Enum.UserCFrame.LeftHand then
-    		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
-    	    if lefttoyenable then
-                lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
-            end
-        elseif part == Enum.UserCFrame.RightHand then
-    		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
-    	    if righttoyenable then
-                righttoypart.CFrame = righthandpart.CFrame * rtoypos
-            end
+	if part == Enum.UserCFrame.Head then
+		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
+		thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
+	elseif part == Enum.UserCFrame.LeftHand then
+		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
+		if lefttoyenable then
+			lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
 		end
-    end)	
+	elseif part == Enum.UserCFrame.RightHand then
+		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
+		if righttoyenable then
+			righttoypart.CFrame = righthandpart.CFrame * rtoypos
+		end
+	end	
 end)
 
 input.InputBegan:connect(function(key)
