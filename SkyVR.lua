@@ -1,8 +1,4 @@
 -- sky vr
-if getgenv().HATDROP then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
-	return
-end
 
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
@@ -104,7 +100,7 @@ if not game:GetService("UserInputService").VREnabled then
 	loader:Destroy()
 	return
 end
-if getgenv().skyVRversion ~= '2.0.0' then
+if getgenv().skyVRversion ~= '2.2.0' then
 	errorr.Text = "Please update your script loader!"
 	errorr.Visible = true
 	t.Parent.Visible = false
@@ -114,6 +110,14 @@ if getgenv().skyVRversion ~= '2.0.0' then
 end
 t:TweenSize(UDim2.new(1,0,1,0),nil,Enum.EasingStyle.Linear,0.1)
 wait(0.06)
+if getgenv().HATDROP then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
+	TextLabel.Text = "Ready!"
+	task.delay(5,function()
+		loader:Destroy()
+	end)
+	return
+end
 
 local plr = game.Players.LocalPlayer
 local input = game:GetService("UserInputService")
