@@ -1,6 +1,6 @@
 -- sky vr
 if getgenv().HATDROP then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/hatdrop-final/SkyVRHatdrop.lua"))()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
 	return
 end
 
