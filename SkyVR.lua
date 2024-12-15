@@ -1,6 +1,5 @@
 -- sky vr
 
-
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local ImageLabel = Instance.new("ImageLabel")
@@ -101,7 +100,7 @@ if not game:GetService("UserInputService").VREnabled then
 	loader:Destroy()
 	return
 end
-if getgenv().skyVRversion ~= '2.0.0' then
+if getgenv().skyVRversion ~= '2.2.0' then
 	errorr.Text = "Please update your script loader!"
 	errorr.Visible = true
 	t.Parent.Visible = false
@@ -111,6 +110,14 @@ if getgenv().skyVRversion ~= '2.0.0' then
 end
 t:TweenSize(UDim2.new(1,0,1,0),nil,Enum.EasingStyle.Linear,0.1)
 wait(0.06)
+if getgenv().HATDROP then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
+	TextLabel.Text = "Ready!"
+	task.delay(5,function()
+		loader:Destroy()
+	end)
+	return
+end
 
 local plr = game.Players.LocalPlayer
 local input = game:GetService("UserInputService")
@@ -396,10 +403,7 @@ do
 				v.Volume = 0
 			end
 		end
-		if head then
-			head:Destroy()
-		end
-		hum.Health = 0
+		hum:ChangeState(15)
 
 		FEScript(char)
 	end)
@@ -411,39 +415,27 @@ task.delay(5,function()
 end)
 
 -- vr handler starts here
-coroutine.wrap(function()
-	local cam = workspace.CurrentCamera
-	cam:GetPropertyChangedSignal("CFrame"):Connect(function()
-		cam.CameraType = "Scriptable"
-		cam.HeadScale = global.options.headscale
-	end)
-end)()
 local cam = workspace.CurrentCamera
-
-cam.CameraType = "Scriptable"
-cam.HeadScale = global.options.headscale
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 
 input.UserCFrameChanged:connect(function(part,move)
 	cam.CameraType = "Scriptable"
 	cam.HeadScale = global.options.headscale
-    pcall(function()
-    	if part == Enum.UserCFrame.Head then
-    		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
-			thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
-    	elseif part == Enum.UserCFrame.LeftHand then
-    		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
-    	    if lefttoyenable then
-                lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
-            end
-        elseif part == Enum.UserCFrame.RightHand then
-    		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
-    	    if righttoyenable then
-                righttoypart.CFrame = righthandpart.CFrame * rtoypos
-            end
+	if part == Enum.UserCFrame.Head then
+		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
+		thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
+	elseif part == Enum.UserCFrame.LeftHand then
+		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
+		if lefttoyenable then
+			lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
 		end
-    end)	
+	elseif part == Enum.UserCFrame.RightHand then
+		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
+		if righttoyenable then
+			righttoypart.CFrame = righthandpart.CFrame * rtoypos
+		end
+	end	
 end)
 
 input.InputBegan:connect(function(key)
