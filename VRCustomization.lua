@@ -1,5 +1,5 @@
 -- DO NOT RUN THIS IN VR MODE
-skyvrversion = '2.0.0'
+skyvrversion = '2.2.0'
 
 VR_Model_Customization_GUI = game:GetObjects("rbxassetid://119916396258908")[1]
 VR_Model_Customization_GUI.Parent = game.CoreGui
