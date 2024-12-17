@@ -403,7 +403,7 @@ do
 				v.Volume = 0
 			end
 		end
-		hum:ChangeState(15)
+		hum.Health = 0
 
 		FEScript(char)
 	end)
@@ -416,6 +416,9 @@ end)
 
 -- vr handler starts here
 local cam = workspace.CurrentCamera
+
+cam.CameraType = "Scriptable"
+cam.HeadScale = global.options.headscale
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 
