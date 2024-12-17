@@ -185,30 +185,17 @@ function findMeshID(char,id)
 end
 
 local function FEScript(char)		
-	local function Align(Part1,Part0,CFrameOffset) 
-		local AlignPos = Instance.new('AlignPosition', Part1);
-		AlignPos.Parent.CanCollide = false;
-		AlignPos.ApplyAtCenterOfMass = true;
-		AlignPos.MaxForce = 67752;
-		AlignPos.MaxVelocity = math.huge/9e110;
-		AlignPos.ReactionForceEnabled = false;
-		AlignPos.Responsiveness = 200;
-		AlignPos.RigidityEnabled = false;
-		local AlignOri = Instance.new('AlignOrientation', Part1);
-		AlignOri.MaxAngularVelocity = math.huge/9e110;
-		AlignOri.MaxTorque = 67752;
-		AlignOri.PrimaryAxisOnly = false;
-		AlignOri.ReactionTorqueEnabled = false;
-		AlignOri.Responsiveness = 200;
-		AlignOri.RigidityEnabled = false;
-		local AttachmentA=Instance.new('Attachment',Part1);
-		local AttachmentB=Instance.new('Attachment',Part0);
-		AttachmentB.CFrame = AttachmentB.CFrame * CFrameOffset
-		AlignPos.Attachment0 = AttachmentA;
-		AlignPos.Attachment1 = AttachmentB;
-		AlignOri.Attachment0 = AttachmentA;
-		AlignOri.Attachment1 = AttachmentB;
-		return {AttachmentB,AlignOri,AlignPos}
+	function _isnetworkowner(Part)
+		return Part.ReceiveAge == 0
+	end
+	
+	function Align(Part1,Part0,cf) 
+	    local con;con=game:GetService("RunService").PostProcessing:Connect(function()
+	        if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
+	        if not _isnetworkowner(Part1) then return end
+	        Part1.CanCollide=false
+	        Part1.CFrame=Part0.CFrame*cf
+	    end)
 	end
 	if not char:FindFirstChild(global.left) and string.sub(global.left,0,7) ~= "meshid:" then
 		errorr.Text = "Cannot find accessory '"..global.left.."' (left)"
