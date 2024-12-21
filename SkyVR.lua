@@ -303,36 +303,32 @@ local function FEScript(char)
 			error("Cannot find accessory '"..global.options.leftToy.."' (leftToy)")
 		end
 	end
-	pcall(function()
+	
 		if string.sub(global.left,0,7) == "meshid:" then
 			local leftallign = Align(findMeshID(char,string.sub(global.left,7,#global.left)).Handle,lefthandpart,CFrame.new())
 			return
 		end
 		local leftallign = Align(char[global.left].Handle,lefthandpart,CFrame.new())
-	end)
-	pcall(function()
+
 		if string.sub(global.right,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.right,7,#global.right)).Handle,righthandpart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.right].Handle,righthandpart,CFrame.new())
-	end) 
-    pcall(function()
+
         if global.options.leftToy == "" then return end
 		if string.sub(global.options.leftToy,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.options.leftToy,7,#global.options.leftToy)).Handle,lefttoypart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.options.leftToy].Handle,lefttoypart,CFrame.new())
-	end)
-	pcall(function()
+
         if global.options.rightToy == "" or global.options.rightToy == nil then return end
 		if string.sub(global.options.rightToy,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.options.rightToy,7,#global.options.rightToy)).Handle,righttoypart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.options.rightToy].Handle,righttoypart,CFrame.new())
-	end)
 	for i,v in global.headhats do
 		pcall(function()
 			local hatname = i
