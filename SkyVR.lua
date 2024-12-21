@@ -192,7 +192,7 @@ local function FEScript(char)
 	function Align(Part1,Part0,cf) 
 	    local con;con=game:GetService("RunService").PostProcessing:Connect(function()
 	        if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
-	        if not _isnetworkowner(Part1) then return end
+	        --if not _isnetworkowner(Part1) then return end
 	        Part1.CanCollide=false
 	        Part1.CFrame=Part0.CFrame*cf
 	    end)
