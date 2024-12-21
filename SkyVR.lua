@@ -1,5 +1,6 @@
 -- sky vr
 
+
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local ImageLabel = Instance.new("ImageLabel")
@@ -100,7 +101,7 @@ if not game:GetService("UserInputService").VREnabled then
 	loader:Destroy()
 	return
 end
-if getgenv().skyVRversion ~= '2.2.0' then
+if getgenv().skyVRversion ~= '2.0.0' then
 	errorr.Text = "Please update your script loader!"
 	errorr.Visible = true
 	t.Parent.Visible = false
@@ -110,14 +111,6 @@ if getgenv().skyVRversion ~= '2.2.0' then
 end
 t:TweenSize(UDim2.new(1,0,1,0),nil,Enum.EasingStyle.Linear,0.1)
 wait(0.06)
-if getgenv().HATDROP then
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
-	TextLabel.Text = "Ready!"
-	task.delay(5,function()
-		loader:Destroy()
-	end)
-	return
-end
 
 local plr = game.Players.LocalPlayer
 local input = game:GetService("UserInputService")
@@ -185,17 +178,30 @@ function findMeshID(char,id)
 end
 
 local function FEScript(char)		
-	function _isnetworkowner(Part)
-		return Part.ReceiveAge == 0
-	end
-	
-	function Align(Part1,Part0,cf) 
-	    local con;con=game:GetService("RunService").PostProcessing:Connect(function()
-	        if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
-	        --if not _isnetworkowner(Part1) then return end
-	        Part1.CanCollide=false
-	        Part1.CFrame=Part0.CFrame*cf
-	    end)
+	local function Align(Part1,Part0,CFrameOffset) 
+		local AlignPos = Instance.new('AlignPosition', Part1);
+		AlignPos.Parent.CanCollide = false;
+		AlignPos.ApplyAtCenterOfMass = true;
+		AlignPos.MaxForce = 67752;
+		AlignPos.MaxVelocity = math.huge/9e110;
+		AlignPos.ReactionForceEnabled = false;
+		AlignPos.Responsiveness = 200;
+		AlignPos.RigidityEnabled = false;
+		local AlignOri = Instance.new('AlignOrientation', Part1);
+		AlignOri.MaxAngularVelocity = math.huge/9e110;
+		AlignOri.MaxTorque = 67752;
+		AlignOri.PrimaryAxisOnly = false;
+		AlignOri.ReactionTorqueEnabled = false;
+		AlignOri.Responsiveness = 200;
+		AlignOri.RigidityEnabled = false;
+		local AttachmentA=Instance.new('Attachment',Part1);
+		local AttachmentB=Instance.new('Attachment',Part0);
+		AttachmentB.CFrame = AttachmentB.CFrame * CFrameOffset
+		AlignPos.Attachment0 = AttachmentA;
+		AlignPos.Attachment1 = AttachmentB;
+		AlignOri.Attachment0 = AttachmentA;
+		AlignOri.Attachment1 = AttachmentB;
+		return {AttachmentB,AlignOri,AlignPos}
 	end
 	if not char:FindFirstChild(global.left) and string.sub(global.left,0,7) ~= "meshid:" then
 		errorr.Text = "Cannot find accessory '"..global.left.."' (left)"
@@ -303,32 +309,36 @@ local function FEScript(char)
 			error("Cannot find accessory '"..global.options.leftToy.."' (leftToy)")
 		end
 	end
-	
+	pcall(function()
 		if string.sub(global.left,0,7) == "meshid:" then
 			local leftallign = Align(findMeshID(char,string.sub(global.left,7,#global.left)).Handle,lefthandpart,CFrame.new())
 			return
 		end
 		local leftallign = Align(char[global.left].Handle,lefthandpart,CFrame.new())
-
+	end)
+	pcall(function()
 		if string.sub(global.right,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.right,7,#global.right)).Handle,righthandpart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.right].Handle,righthandpart,CFrame.new())
-
+	end) 
+    pcall(function()
         if global.options.leftToy == "" then return end
 		if string.sub(global.options.leftToy,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.options.leftToy,7,#global.options.leftToy)).Handle,lefttoypart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.options.leftToy].Handle,lefttoypart,CFrame.new())
-
+	end)
+	pcall(function()
         if global.options.rightToy == "" or global.options.rightToy == nil then return end
 		if string.sub(global.options.rightToy,0,7) == "meshid:" then
 			local rightallign = Align(findMeshID(char,string.sub(global.options.rightToy,7,#global.options.rightToy)).Handle,righttoypart,CFrame.new())
 			return
 		end
 		local rightallign = Align(char[global.options.rightToy].Handle,righttoypart,CFrame.new())
+	end)
 	for i,v in global.headhats do
 		pcall(function()
 			local hatname = i
@@ -371,20 +381,23 @@ do
 		local head = char:WaitForChild("Head")
 		local hum = char:FindFirstChildOfClass("Humanoid")
 		local continueTping = true
-		--coroutine.wrap(function()
-		--	while continueTping do
-		--		task.wait()
-		--		hrp.CFrame = headpart.CFrame
-		--	end
-		--end)()
+		coroutine.wrap(function()
+			while continueTping do
+				task.wait()
+				hrp.CFrame = headpart.CFrame
+			end
+		end)()
 
 		
 		task.wait(0.25)	
-		--continueTping = false
+		continueTping = false
 		for i,v in ipairs(hrp:GetChildren()) do
 			if v:IsA("Sound") then
 				v.Volume = 0
 			end
+		end
+		if head then
+			head:Destroy()
 		end
 		hum.Health = 0
 
@@ -398,6 +411,13 @@ task.delay(5,function()
 end)
 
 -- vr handler starts here
+coroutine.wrap(function()
+	local cam = workspace.CurrentCamera
+	cam:GetPropertyChangedSignal("CFrame"):Connect(function()
+		cam.CameraType = "Scriptable"
+		cam.HeadScale = global.options.headscale
+	end)
+end)()
 local cam = workspace.CurrentCamera
 
 cam.CameraType = "Scriptable"
@@ -408,20 +428,22 @@ game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 input.UserCFrameChanged:connect(function(part,move)
 	cam.CameraType = "Scriptable"
 	cam.HeadScale = global.options.headscale
-	if part == Enum.UserCFrame.Head then
-		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
-		thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
-	elseif part == Enum.UserCFrame.LeftHand then
-		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
-		if lefttoyenable then
-			lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
+    pcall(function()
+    	if part == Enum.UserCFrame.Head then
+    		headpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move)
+			thirdpersonpart.CFrame = cam.CFrame * (CFrame.new(move.p*(cam.HeadScale-1))*move) * CFrame.new(0,0,-10) * CFrame.Angles(math.rad(180),0,math.rad(180))
+    	elseif part == Enum.UserCFrame.LeftHand then
+    		lefthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.lefthandrotoffset.X),math.rad(global.options.lefthandrotoffset.Y),math.rad(global.options.lefthandrotoffset.Z)))
+    	    if lefttoyenable then
+                lefttoypart.CFrame = lefthandpart.CFrame * ltoypos
+            end
+        elseif part == Enum.UserCFrame.RightHand then
+    		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
+    	    if righttoyenable then
+                righttoypart.CFrame = righthandpart.CFrame * rtoypos
+            end
 		end
-	elseif part == Enum.UserCFrame.RightHand then
-		righthandpart.CFrame = cam.CFrame*(CFrame.new(move.p*(cam.HeadScale-1))*move*CFrame.Angles(math.rad(global.options.righthandrotoffset.X),math.rad(global.options.righthandrotoffset.Y),math.rad(global.options.righthandrotoffset.Z)))
-		if righttoyenable then
-			righttoypart.CFrame = righthandpart.CFrame * rtoypos
-		end
-	end	
+    end)	
 end)
 
 input.InputBegan:connect(function(key)
