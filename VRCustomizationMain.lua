@@ -223,7 +223,7 @@ function updateList()
 				newButton.Error.Visible = true
 			end
 		elseif currentPage == "toyhats" then
-			if ifind(global.skyvrsettings.headhats, 'meshid:'..MeshId) then
+			if ifind(global.skyvrsettings.headhats, newButton.Name) then
 				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
 				newButton.Error.Visible = true
 			end
