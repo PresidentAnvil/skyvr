@@ -32,7 +32,7 @@ local currentPage = "headhats"
 local on = Color3.fromRGB(120, 233, 101)
 local default = Color3.fromRGB(90, 142, 233)
 local s=tostring
-local irad=function(n) return math.floor(n/math.pi*180) end
+local irad=function(n) return (n/math.pi)*180 end
 local rarmcf = Vector3.zero
 local larmcf = Vector3.zero
 local rlegcf = Vector3.zero
@@ -106,7 +106,7 @@ function dump(o)
 			local x,y,z = s(o.X),s(o.Y),s(o.Z)
 			local ox,oy,oz = o:ToOrientation()
 			o = 'CFrame.new('..s(o.Position)..')'
-			if ox ~= 0 and oy ~= 0 and oz ~= 0 then
+			if ox ~= 0 or oy ~= 0 or oz ~= 0 then
 				o = o..' * CFrame.Angles(math.rad('..irad(ox)..'),math.rad('..irad(oy)..'),math.rad('..irad(oz)..'))'
 			end
 		elseif typeof(o) == 'Vector3' then
