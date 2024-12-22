@@ -119,6 +119,14 @@ if getgenv().HATDROP then
 	end)
 	return
 end
+if getgenv().fullbody then
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRFullbody.lua"))()
+	TextLabel.Text = "Ready!"
+	task.delay(5,function()
+		loader:Destroy()
+	end)
+	return
+end
 local plr = game.Players.LocalPlayer
 local input = game:GetService("UserInputService")
 
