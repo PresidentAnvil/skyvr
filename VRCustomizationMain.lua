@@ -19,7 +19,7 @@ local ExtraSettings = script.Parent.ExtraSettings
 local Export = script.Parent.Export
 local PreviewLimbs = script.Parent.the
 local PreviewHatsFolder = script.Parent.hats
-local Popup = script.Parent.PopupFrame
+local Popup = script.PopupFrame
 --------------------------------------------
 local Tabs = MainFrame.Tabs.ScrollingFrame
 local Selection = MainFrame.Selection.ScrollingFrame
