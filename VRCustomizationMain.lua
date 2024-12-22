@@ -278,6 +278,16 @@ function updateList()
 				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
 				newButton.Error.Visible = true
 			end
+			if global.skyvrsettings.rightleg == newButton.Name then
+				newButton.Settings.BackgroundColor3 = on
+			else
+				newButton.Settings.BackgroundColor3 = default
+			end
+			if global.skyvrsettings.leftleg == newButton.Name then
+				newButton.Settings2.BackgroundColor3 = on
+			else
+				newButton.Settings2.BackgroundColor3 = default
+			end
 		elseif currentPage == "toyhats" then
 			if ifind(global.skyvrsettings.headhats, newButton.Name) then
 				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
@@ -583,7 +593,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 				accessoriesActive[i]=1
 			end
 		end
-		
+
 		if global.skyvrsettings.rightleg ~= "" then
 			local i = global.skyvrsettings.rightleg
 			if PreviewHatsFolder:FindFirstChild(i) then 
@@ -602,7 +612,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 				accessoriesActive[i]=1
 			end
 		end
-		
+
 		if global.skyvrsettings.leftleg ~= "" then
 			local i = global.skyvrsettings.leftleg
 			if PreviewHatsFolder:FindFirstChild(i) then 
