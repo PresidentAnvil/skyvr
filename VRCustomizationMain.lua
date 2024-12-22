@@ -1,4 +1,3 @@
-local script = Instance.new('LocalScript', VR_Model_Customization_GUI)
 local global = (getgenv and getgenv()) or _G
 global.skyvrsettings = {
 	hatdrop = false,
@@ -6,6 +5,8 @@ global.skyvrsettings = {
 	headhats = {},
 	leftarm = "",
 	rightarm = "",
+	leftleg = "",
+	rightleg = "",
 	toyhats = {leftarm = "",rightarm = ""}
 }
 
@@ -18,6 +19,7 @@ local Settings = script.Parent.Settings
 local ExtraSettings = script.Parent.ExtraSettings
 local Export = script.Parent.Export
 local PreviewLimbs = script.Parent.the
+local PreviewCharacter = script.Parent.FullBodyCharacter
 local PreviewHatsFolder = script.Parent.hats
 local Popup = script.Parent.PopupFrame
 --------------------------------------------
@@ -25,14 +27,16 @@ local Tabs = MainFrame.Tabs.ScrollingFrame
 local Selection = MainFrame.Selection.ScrollingFrame
 local tempHat = Selection.Temp
 --------------------------------------------
-local zEq = -0.91438071487
+local zEq = -0.93438071487
 local currentPage = "headhats"
 local on = Color3.fromRGB(120, 233, 101)
 local default = Color3.fromRGB(90, 142, 233)
 local s=tostring
 local irad=function(n) return math.floor(n/math.pi*180) end
-local rarmcf = Vector3.new(0,0,0)
-local larmcf = Vector3.new(0,0,0)
+local rarmcf = Vector3.zero
+local larmcf = Vector3.zero
+local rlegcf = Vector3.zero
+local llegcf = Vector3.zero
 local copy = toclipboard or setclipboard
 local camera = Instance.new("Camera")
 
@@ -43,11 +47,10 @@ function alert(title,desc,dur)
 		Duration = dur;
 	})
 end
-Preview.Parent.Visible=true
 
 function deepfind(w,p,l)
 	for i,v in pairs(w) do
-			if v[p]==l then return true end
+		if v[p]==l then return true end
 	end
 	return false
 end
@@ -166,6 +169,9 @@ function updateList()
 			if currentPage == 'toyhats' then
 				newButton.Settings.Text = "Set as Right Toy"
 				newButton.Settings2.Text = "Set as Left Toy"
+			elseif currentPage == 'leghats' then
+				newButton.Settings.Text = "Set as Right Leg"
+				newButton.Settings2.Text = "Set as Left Leg"
 			end
 			newButton.Settings2.MouseButton1Click:Connect(function()
 				if newButton.Error.Visible == true then return end
@@ -175,11 +181,13 @@ function updateList()
 						Selection[global.skyvrsettings.leftarm].Settings.BackgroundColor3 = default
 						Selection[global.skyvrsettings.leftarm].Settings2.BackgroundColor3 = default
 					end
-					if global.skyvrsettings.rightarm == v.Name then
+					if global.skyvrsettings.rightarm == newButton.Name then
 						newButton.Settings.BackgroundColor3 = default
+						newButton.Settings2.BackgroundColor3 = default
 						global.skyvrsettings.rightarm = ""
 					end
 					if global.skyvrsettings.leftarm == newButton.Name then
+						newButton.Settings.BackgroundColor3 = default
 						newButton.Settings2.BackgroundColor3 = default
 						global.skyvrsettings.leftarm = ""
 					else
@@ -194,13 +202,34 @@ function updateList()
 					end
 					if global.skyvrsettings.toyhats.rightarm == newButton.Name then
 						newButton.Settings.BackgroundColor3 = default
+						newButton.Settings2.BackgroundColor3 = default
 						global.skyvrsettings.toyhats.rightarm = ""
 					end
 					if global.skyvrsettings.toyhats.leftarm == newButton.Name then
+						newButton.Settings.BackgroundColor3 = default
 						newButton.Settings2.BackgroundColor3 = default
 						global.skyvrsettings.toyhats.leftarm = ""
 					else
 						global.skyvrsettings.toyhats.leftarm= newButton.Name
+						newButton.Settings2.BackgroundColor3 = on
+					end
+				end
+				if currentPage == "leghats" then
+					if global.skyvrsettings.leftleg ~= "" then
+						Selection[global.skyvrsettings.leftleg].Settings.BackgroundColor3 = default
+						Selection[global.skyvrsettings.leftleg].Settings2.BackgroundColor3 = default
+					end
+					if global.skyvrsettings.rightleg == newButton.Name then
+						newButton.Settings.BackgroundColor3 = default
+						newButton.Settings2.BackgroundColor3 = default
+						global.skyvrsettings.rightleg = ""
+					end
+					if global.skyvrsettings.leftleg == newButton.Name then
+						newButton.Settings.BackgroundColor3 = default
+						newButton.Settings2.BackgroundColor3 = default
+						global.skyvrsettings.leftleg = ""
+					else
+						global.skyvrsettings.leftleg= newButton.Name
 						newButton.Settings2.BackgroundColor3 = on
 					end
 				end
@@ -214,6 +243,9 @@ function updateList()
 				newButton.Error.Visible = true
 			elseif global.skyvrsettings.toyhats.rightarm == newButton.Name or global.skyvrsettings.toyhats.leftarm == newButton.Name then
 				newButton.Error.TextLabel.Text = "Already used in: Toy Hats"
+				newButton.Error.Visible = true
+			elseif global.skyvrsettings.rightleg == newButton.Name or global.skyvrsettings.leftleg == newButton.Name then
+				newButton.Error.TextLabel.Text = "Already used in: Leg Hats"
 				newButton.Error.Visible = true
 			end
 			if global.skyvrsettings.rightarm == newButton.Name then
@@ -232,14 +264,29 @@ function updateList()
 			elseif global.skyvrsettings.toyhats.rightarm == newButton.Name or global.skyvrsettings.toyhats.leftarm == newButton.Name then
 				newButton.Error.TextLabel.Text = "Already used in: Toy Hats"
 				newButton.Error.Visible = true
+			elseif global.skyvrsettings.rightleg == newButton.Name or global.skyvrsettings.leftleg == newButton.Name then
+				newButton.Error.TextLabel.Text = "Already used in: Leg Hats"
+				newButton.Error.Visible = true
+			end
+		elseif currentPage == "leghats" then
+			if global.skyvrsettings.rightarm == newButton.Name or global.skyvrsettings.leftarm == newButton.Name then
+				newButton.Error.Visible = true
+			elseif global.skyvrsettings.toyhats.rightarm == newButton.Name or global.skyvrsettings.toyhats.leftarm == newButton.Name then
+				newButton.Error.TextLabel.Text = "Already used in: Toy Hats"
+				newButton.Error.Visible = true
+			elseif ifind(global.skyvrsettings.headhats, newButton.Name) then
+				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
+				newButton.Error.Visible = true
 			end
 		elseif currentPage == "toyhats" then
 			if ifind(global.skyvrsettings.headhats, newButton.Name) then
 				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
 				newButton.Error.Visible = true
-			end
-			if global.skyvrsettings.rightarm == newButton.Name or global.skyvrsettings.leftarm == newButton.Name then
+			elseif global.skyvrsettings.rightarm == newButton.Name or global.skyvrsettings.leftarm == newButton.Name then
 				newButton.Error.TextLabel.Text = "Already used in: Head Hats"
+				newButton.Error.Visible = true
+			elseif global.skyvrsettings.rightleg == newButton.Name or global.skyvrsettings.leftleg == newButton.Name then
+				newButton.Error.TextLabel.Text = "Already used in: Leg Hats"
 				newButton.Error.Visible = true
 			end
 			if global.skyvrsettings.toyhats.rightarm == newButton.Name then
@@ -313,18 +360,26 @@ function updateList()
 					newButton.Settings.BackgroundColor3 = on
 				end
 			end
+			if currentPage == "leghats" then
+				if global.skyvrsettings.rightleg ~= "" then
+					Selection[global.skyvrsettings.rightleg].Settings.BackgroundColor3 = default
+					Selection[global.skyvrsettings.rightleg].Settings2.BackgroundColor3 = default
+				end
+				if global.skyvrsettings.leftleg == newButton.Name then
+					newButton.Settings2.BackgroundColor3 = default
+					global.skyvrsettings.leftleg = ""
+				end
+				if global.skyvrsettings.rightleg == newButton.Name then
+					newButton.Settings.BackgroundColor3 = default
+					global.skyvrsettings.rightleg = ""
+				else
+					newButton.Settings.BackgroundColor3 = on
+					global.skyvrsettings.rightleg= newButton.Name
+				end
+			end
 		end)
 
 		newButton.Visible = true
-	end
-end
-
-for i,v in ipairs(Tabs:GetChildren()) do
-	if v:IsA("ImageButton") then
-		v.MouseButton1Click:Connect(function()
-			currentPage = v.Name
-			updateList()
-		end)
 	end
 end
 
@@ -424,12 +479,13 @@ MainFrame.Export.MouseButton1Click:Connect(function()
 	local ldonething = 'Vector3.new('..s(larmcf)..')'
 	local rdonething = 'Vector3.new('..s(rarmcf)..')'
 
-	local generatedScript = 'getgenv().headhats = '..dump(headhats)..'\ngetgenv().right = "'..configs.rightarm..'"\ngetgenv().left = "'..configs.leftarm..'"\ngetgenv().HATDROP = '..tostring(global.skyvrsettings.hatdrop)..'\ngetgenv().fullbody = '..tostring(global.skyvrsettings.fullbody)..'\ngetgenv().options = {\n	dontfling = false,\n	outlinesEnabled = false, -- buggy-ish\n	righthandrotoffset = '..rdonething..',\n	lefthandrotoffset = '..ldonething..',\n	headscale = 3,\n	NetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers\n	controllerRotationOffset = Vector3.new(180,180,0),\n	HeadHatTransparency = 1,\n	leftToyBind = Enum.KeyCode.ButtonY, -- :D\n	rightToyBind = Enum.KeyCode.ButtonB, -- :D\n	leftToy = "'..configs.toyhats.leftarm..'", -- default is "" or nil\n	rightToy = "'..configs.toyhats.rightarm..'", -- default is "" or nil\n}\ngetgenv().skyVRversion = \''..skyvrversion..'\'\nloadstring(game:HttpGet(\'https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVR.lua\'))();'
+	local generatedScript = ((global.skyvrsettings.fullbody and '-- ↓ DO NOT change this variable\'s name! despite being called headhats, it will act as\n-- your torso for fullbody mode regardless. i kept it as headhats for the sake of\n-- compatability with the other modes.\n') or "")..'getgenv().headhats = '..dump(headhats)..'\ngetgenv().right = "'..configs.rightarm..'"\ngetgenv().left = "'..configs.leftarm..'"\ngetgenv().HATDROP = '..tostring(global.skyvrsettings.hatdrop)..'\ngetgenv().fullbody = '..tostring(global.skyvrsettings.fullbody)..'\ngetgenv().options = {\n	dontfling = false,\n	righthandrotoffset = '..rdonething..',\n	lefthandrotoffset = '..ldonething..',\n	headscale = 3,\n	rightleg = "'..global.skyvrsettings.rightleg..'",\n	leftleg = "'..global.skyvrsettings.leftleg..'",\n	rightlegrotoffset = Vector3.new('..s(rlegcf)..'),\n	leftlegrotoffset = Vector3.new('..s(llegcf)..'),\n	NetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers\n	controllerRotationOffset = Vector3.new(180,180,0),\n	HeadHatTransparency = 1,\n	leftToyBind = Enum.KeyCode.ButtonY,\n	rightToyBind = Enum.KeyCode.ButtonB,\n	leftToy = "'..configs.toyhats.leftarm..'", -- default is "" or nil\n	rightToy = "'..configs.toyhats.rightarm..'", -- default is "" or nil\n}\ngetgenv().skyVRversion = \''..skyvrversion..'\'\nloadstring(game:HttpGet(\'https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVR.lua\'))();'
 
 	Export.Visible = true
 	Export.Script.Text = generatedScript
 	copy(generatedScript)
 end)
+
 ExtraSettings.Selection.lcfrot.FocusLost:Connect(function()
 	local split = string.split(ExtraSettings.Selection.lcfrot.Text,',')
 	if #split == 3 then
@@ -447,10 +503,133 @@ ExtraSettings.Selection.rcfrot.FocusLost:Connect(function()
 		ExtraSettings.Selection.rcfrot.Text = '0,0,0'
 	end
 end)
-game:GetService("RunService").RenderStepped:Connect(function()
-	local accessoriesActive = {}
 
-	--PreviewLimbs:SetPrimaryPartCFrame(CFrame.new(Player.Character.HumanoidRootPart.Position)*CFrame.new(0,7,5))
+ExtraSettings.Selection2.lcfrot.FocusLost:Connect(function()
+	if not global.skyvrsettings.fullbody then return end
+	local split = string.split(ExtraSettings.Selection.lcfrot.Text,',')
+	if #split == 3 then
+		llegcf = Vector3.new(unpack(split))
+	else
+		ExtraSettings.Selection.lcfrot.Text = '0,0,0'
+	end
+end)
+
+ExtraSettings.Selection2.rcfrot.FocusLost:Connect(function()
+	if not global.skyvrsettings.fullbody then return end
+	local split = string.split(ExtraSettings.Selection.rcfrot.Text,',')
+	if #split == 3 then
+		rlegcf = Vector3.new(unpack(split))
+	else
+		ExtraSettings.Selection.rcfrot.Text = '0,0,0'
+	end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	if global.skyvrsettings.fullbody then
+		local accessoriesActive = {}
+
+		for i,v in pairs(global.skyvrsettings.headhats) do
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+				handleClone:BreakJoints()
+				handleClone.CFrame = PreviewCharacter.Model.torso.CFrame * v
+				accessoriesActive[i]=1
+			else
+				local accessory = findMeshID(Character,i) or Character[i]
+				local handleClone = accessory.Handle:Clone()
+				handleClone:BreakJoints()
+				handleClone.Parent = PreviewHatsFolder
+				handleClone.Name = i
+				handleClone.Anchored = true
+				handleClone.CFrame = PreviewCharacter.Model.torso.CFrame * v
+				accessoriesActive[i]=1
+			end
+		end
+
+		if global.skyvrsettings.leftarm ~= "" then
+			local i = global.skyvrsettings.leftarm
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+				handleClone:BreakJoints()
+				handleClone.CFrame = PreviewCharacter.Model.leftarm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
+				accessoriesActive[i]=1
+			else
+				local accessory = findMeshID(Character,i) or Character[i]
+				local handleClone = accessory.Handle:Clone()
+				handleClone:BreakJoints()
+				handleClone.Parent = PreviewHatsFolder
+				handleClone.Name = i
+				handleClone.Anchored = true
+				handleClone.CFrame = PreviewCharacter.Model.leftarm.CFrame * CFrame.Angles(math.rad(larmcf.X+0),math.rad(larmcf.Y),math.rad(larmcf.Z))
+				accessoriesActive[i]=1
+			end
+		end
+
+		if global.skyvrsettings.rightarm ~= "" then
+			local i = global.skyvrsettings.rightarm
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+
+				handleClone.CFrame = PreviewCharacter.Model.rightarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
+				accessoriesActive[i]=1
+			else
+				local accessory = findMeshID(Character,i) or Character[i]
+				local handleClone = accessory.Handle:Clone()
+
+				handleClone.Parent = PreviewHatsFolder
+				handleClone.Name = i
+				handleClone.Anchored = true
+				handleClone.CFrame = PreviewCharacter.Model.rightarm.CFrame * CFrame.Angles(math.rad(rarmcf.X+0),math.rad(rarmcf.Y),math.rad(rarmcf.Z))
+				accessoriesActive[i]=1
+			end
+		end
+		
+		if global.skyvrsettings.rightleg ~= "" then
+			local i = global.skyvrsettings.rightleg
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+
+				handleClone.CFrame = PreviewCharacter.Model.rightleg.CFrame * CFrame.Angles(math.rad(rlegcf.X+0),math.rad(rlegcf.Y),math.rad(rlegcf.Z))
+				accessoriesActive[i]=1
+			else
+				local accessory = findMeshID(Character,i) or Character[i]
+				local handleClone = accessory.Handle:Clone()
+
+				handleClone.Parent = PreviewHatsFolder
+				handleClone.Name = i
+				handleClone.Anchored = true
+				handleClone.CFrame = PreviewCharacter.Model.rightleg.CFrame * CFrame.Angles(math.rad(rlegcf.X+0),math.rad(rlegcf.Y),math.rad(rlegcf.Z))
+				accessoriesActive[i]=1
+			end
+		end
+		
+		if global.skyvrsettings.leftleg ~= "" then
+			local i = global.skyvrsettings.leftleg
+			if PreviewHatsFolder:FindFirstChild(i) then 
+				local handleClone = PreviewHatsFolder[i]
+
+				handleClone.CFrame = PreviewCharacter.Model.leftleg.CFrame * CFrame.Angles(math.rad(llegcf.X+0),math.rad(llegcf.Y),math.rad(llegcf.Z))
+				accessoriesActive[i]=1
+			else
+				local accessory = findMeshID(Character,i) or Character[i]
+				local handleClone = accessory.Handle:Clone()
+
+				handleClone.Parent = PreviewHatsFolder
+				handleClone.Name = i
+				handleClone.Anchored = true
+				handleClone.CFrame = PreviewCharacter.Model.leftleg.CFrame * CFrame.Angles(math.rad(llegcf.X+0),math.rad(llegcf.Y),math.rad(llegcf.Z))
+				accessoriesActive[i]=1
+			end
+		end
+
+		for i,v in ipairs(PreviewHatsFolder:GetChildren()) do
+			if not ifind(accessoriesActive,v.Name) then
+				v:Destroy()
+			end
+		end
+		return
+	end
+	local accessoriesActive = {}
 
 	for i,v in pairs(global.skyvrsettings.headhats) do
 		if PreviewHatsFolder:FindFirstChild(i) then 
@@ -469,8 +648,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
 			accessoriesActive[i]=1
 		end
 	end
-
-	-- for anyone reading this, as a slight ego boost, i'm letting u know that i made leftarm check first :)
 
 	if global.skyvrsettings.leftarm ~= "" then
 		local i = global.skyvrsettings.leftarm
@@ -513,9 +690,9 @@ game:GetService("RunService").RenderStepped:Connect(function()
 
 
 	for i,v in ipairs(PreviewHatsFolder:GetChildren()) do
-			if not ifind(accessoriesActive,v.Name) then
-				v:Destroy()
-			end
+		if not ifind(accessoriesActive,v.Name) then
+			v:Destroy()
+		end
 	end
 end)
 
@@ -527,7 +704,8 @@ game:GetService("UserInputService").InputBegan:Connect(function(input,gpe)
 	end
 end)
 
-PreviewLimbs.Parent = Preview
+repeat task.wait() until not Popup.Visible;
+((global.skyvrsettings.fullbody and PreviewCharacter) or PreviewLimbs).Parent = Preview
 PreviewHatsFolder.Parent = Preview
 Preview.CurrentCamera = camera
 camera.CFrame = CFrame.new(-28.55,4,8) * CFrame.Angles(0,math.pi,0)
@@ -539,4 +717,17 @@ camera.FieldOfView = 70
 camera.FieldOfViewMode = "Vertical"
 camera.MaxAxisFieldOfView = 70
 
+for i,v in ipairs(Tabs:GetChildren()) do
+	if v:IsA("ImageButton") then
+		if v.Name=="toyhats" and global.skyvrsettings.fullbody then v.Visible=false continue end
+		if v.Name=="leghats" and not global.skyvrsettings.fullbody then v.Visible=false continue end
+		if v.Name=="headhats" and global.skyvrsettings.fullbody then v.TextLabel.Text = "Torso Accesories" end
+		v.MouseButton1Click:Connect(function()
+			currentPage = v.Name
+			updateList()
+		end)
+	end
+end
+ExtraSettings.Selection2.hide.Visible = not global.skyvrsettings.fullbody
+Preview.Parent.Visible = true
 updateList()
