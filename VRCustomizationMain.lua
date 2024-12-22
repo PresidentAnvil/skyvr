@@ -1,3 +1,4 @@
+local script = VR_Model_Customization_GUI
 local global = (getgenv and getgenv()) or _G
 global.skyvrsettings = {
 	hatdrop = false,
