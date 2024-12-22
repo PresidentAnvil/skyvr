@@ -218,7 +218,7 @@ HatdropCallback(Player.Character, function(allhats)
         if not v[1]:FindFirstChild("Handle") then continue end
         if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-        Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]]["meshid:"..v[3]])or CFrame.new())
+        Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][v[3]])or CFrame.new())
     end
 end)
 
@@ -229,7 +229,7 @@ getgenv().conn = Player.CharacterAdded:Connect(function(Character)
             if not v[1]:FindFirstChild("Handle") then continue end
             if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-            Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][( (v[3]:find("meshid:") and "meshid:"..v[3]) or v[3] )])or CFrame.new())
+            Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])])or CFrame.new())
         end
     end)
 end)
