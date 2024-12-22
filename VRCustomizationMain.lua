@@ -44,6 +44,13 @@ function alert(title,desc,dur)
 	})
 end
 Preview.Parent.Visible=true
+
+function deepfind(w,p,l)
+	for i,v in pairs(w) do
+			if v[p]==l then return true end
+	end
+	return false
+end
 function ifind(t,a)
 	for i,v in pairs(t) do
 		if i==a then
@@ -113,10 +120,11 @@ if not Character then
 	Character = Player.Character
 end
 
+local children = Character:GetChildren()
 function updateList()
 	for i,v in ipairs(Selection:GetChildren()) do if v.Name ~= "Temp" and v:IsA("Frame") then v:Destroy() end end
 
-	for i,v in ipairs(Character:GetChildren()) do
+	for i,v in ipairs(children) do
 		if not v:IsA("Accessory") then continue end
 		local Handle = v.Handle:Clone()
 		local newButton = tempHat:Clone()
@@ -136,8 +144,10 @@ function updateList()
 			MeshId = string.match(MeshId,"%d+")
 		end
 		local saveasmeshid = not tempHat.Parent:FindFirstChild('meshid:'..MeshId)
+		local dont = deepfind(tempHat.Parent:GetChildren(),"Name",'meshid:'..MeshId) and deepfind(tempHat.Parent:GetChildren(),"Name",v.Name)
+		newButton.DisabledError.Visible=dont
 		newButton.Parent = tempHat.Parent
-		newButton.Name = (saveasmeshid and 'meshid:'..MeshId) or v.Name
+		newButton.Name = ((dont and "dupe ") or "")..((saveasmeshid and 'meshid:'..MeshId) or v.Name)
 		newButton.hatname.Text = v.Name
 		newButton.meshid.Text = MeshId
 		Handle.Parent = newButton.ViewportFrame
@@ -159,6 +169,7 @@ function updateList()
 			end
 			newButton.Settings2.MouseButton1Click:Connect(function()
 				if newButton.Error.Visible == true then return end
+				if dont then return end
 				if currentPage == "armhats" then
 					if global.skyvrsettings.leftarm ~= "" then
 						Selection[global.skyvrsettings.leftarm].Settings.BackgroundColor3 = default
@@ -245,6 +256,7 @@ function updateList()
 		end
 
 		newButton.Settings.MouseButton1Click:Connect(function()
+			if dont then return end
 			if newButton.Error.Visible == true then return end
 			if currentPage == "headhats" then
 				Settings.Visible = true
