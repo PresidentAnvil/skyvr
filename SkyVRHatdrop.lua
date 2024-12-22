@@ -105,7 +105,7 @@ function HatdropCallback(Character, callback)
 
 	workspace.FallenPartsDestroyHeight = 0/0
     local hrp = Character.HumanoidRootPart
-    local torso = Character.Torso
+    local torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("LowerTorso")
     local startCF = headpart.CFrame
     hrp.CFrame=startCF*cfn(math.random(-6,6),0,math.random(-6,6))
     task.wait(.1)
