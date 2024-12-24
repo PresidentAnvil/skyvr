@@ -298,7 +298,6 @@ local function MoveClone(X,Y,Z)
 end
 
 coroutine.wrap(function()
-	if VRReady then return end
     while true do game:GetService("RunService").RenderStepped:Wait()
         if HumanDied then break end
         if WDown then  MoveClone(0,0,1e4) if walka.IsPlaying ~= true then walka:Play() end end
@@ -324,8 +323,9 @@ UserInputService.InputBegan:Connect(function(input,gpe)
 		VirtualBody.Humanoid.Jump = true
 	end
 end)
-
+VirtualBody.Humanoid.WalkSpeed = 16
 RunService.Stepped:Connect(function()
+	if not VRReady then return end
 	VirtualBody.Humanoid.WalkSpeed = (14*triggerPressure)-2
 	local Direction = walklookvec
 	local Start = VirtualBody.HumanoidRootPart.Position
