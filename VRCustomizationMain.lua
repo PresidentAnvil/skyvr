@@ -741,4 +741,5 @@ for i,v in ipairs(Tabs:GetChildren()) do
 end
 ExtraSettings.Selection2.hide.Visible = not global.skyvrsettings.fullbody
 Preview.Parent.Visible = true
+if Preview.Parent:FindFirstChild("blah") then Preview.Parent.blah.Visible = getgenv().fullbody end
 updateList()
