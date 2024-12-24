@@ -212,13 +212,10 @@ end)
 
 Character.Humanoid.WalkSpeed = 0
 Character.Humanoid.JumpPower = 1
-local OnMoving = RunService.Stepped:Connect(function()
-	if not dowalk then return end
-	local Direction = walklookvec
-	local Start = VirtualBody.HumanoidRootPart.Position
-	local Point = Start + Direction * 6
-	
-	VirtualBody.Humanoid:MoveTo(Point)
+RunService.Stepped:Connect(function()
+	if not VRReady then 
+		--limbCFs.Head = workspace.CurrentCamera.CFrame
+	end
 end)
 for _, Part in next, VirtualBody:GetChildren() do
 	if Part:IsA("BasePart") then
@@ -262,7 +259,7 @@ local function KEYDOWN(_,Processed)
     if HumanDied then CONDOWN:Disconnect(); return end
     if Processed ~= true then
         local Key = _.KeyCode
-        if Key == Enum.KeyCode.W or Key == Enum.KeyCode.ButtonR2 then
+        if Key == Enum.KeyCode.W then
             WDown = true end
         if Key == Enum.KeyCode.A then
             ADown = true end
@@ -282,7 +279,7 @@ local function KEYUP(_,a)
     if a then return end
     if HumanDied then CONUP:Disconnect(); return end
     local Key = _.KeyCode
-    if Key == Enum.KeyCode.W or Key == Enum.KeyCode.ButtonR2 then
+    if Key == Enum.KeyCode.W then
         WDown = false end
     if Key == Enum.KeyCode.A then
         ADown = false end
@@ -315,13 +312,27 @@ coroutine.wrap(function()
     end 
 end)()
 
-if VRReady then RunService.Stepped:Connect(function()
-	local Direction = Character.Humanoid.MoveDirection
+triggerPressure = 0
+UserInputService.InputChanged:Connect(function(input,gpe)
+	if input.KeyCode == Enum.KeyCode.ButtonR2 then
+		triggerPressure = input.Position.Z
+	end
+end)
+
+UserInputService.InputBegan:Connect(function(input,gpe)
+	if input.KeyCode == Enum.KeyCode.ButtonA then
+		VirtualBody.Humanoid.Jump = true
+	end
+end)
+
+RunService.Stepped:Connect(function()
+	VirtualBody.Humanoid.WalkSpeed = (14*triggerPressure)-2
+	local Direction = walklookvec
 	local Start = VirtualBody.HumanoidRootPart.Position
 	local Point = Start + Direction * 6
 	
 	VirtualBody.Humanoid:MoveTo(Point)
-end) end
+end)
 
 local FootUpdateDebounce = tick()
 
@@ -409,7 +420,7 @@ local function UpdateFooting()
 		CFrame.new(FootPlacementSettings.RightOffset) -
 		Vector3.new(0, Dist, 0) +
 		Character.Humanoid.MoveDirection * (VirtualBody.Humanoid.WalkSpeed / 8) * 2
-	
+		
 	if FootReady(VirtualRig.RightFoot, FootTarget) then
 		VirtualRig.RightFoot.BodyPosition.Position = FootTarget.p
 		VirtualRig.RightFoot.BodyGyro.CFrame = Flatten(VirtualRig.LowerTorso.CFrame)
@@ -440,7 +451,7 @@ local function OnUserCFrameChanged(UserCFrame, Positioning, IgnoreTorso)
 	limbCFs.Torso = VirtualRig.UpperTorso.CFrame * CFrame.new(0, -0.25, 0) * AccessorySettings.LimbOffset
 	limbCFs.RightLeg = VirtualRig.RightFoot.CFrame * CFrame.new(0, 0.5, 0) * AccessorySettings.LimbOffset
 	limbCFs.LeftLeg = VirtualRig.LeftLowerLeg.CFrame:Lerp(VirtualRig.LeftFoot.CFrame, 0.5)* CFrame.new(0, 0.5, 0) * AccessorySettings.LimbOffset
-	if UserCFrame == Enum.UserCFrame.Head and AccessorySettings.Head then
+	if UserCFrame == Enum.UserCFrame.Head then
 		limbCFs.Head = Positioning
 	elseif UserCFrame == Enum.UserCFrame.RightHand and AccessorySettings.RightArm then
 		walklookvec = Positioning.lookVector
@@ -634,7 +645,8 @@ ChatHUDFunc = function()
 	local Players = game:GetService("Players")
 	 local Client = Players.LocalPlayer
 	
-	local ChatHUD = game:GetObjects("rbxassetid://4649972829")[1]
+	local ChatHUD: ScreenGui = game:GetObjects("rbxassetid://4649972829")[1]
+	ChatHUD.ResetOnSpawn = false
 	 local GlobalFrame = ChatHUD.GlobalFrame
 	  local Template = GlobalFrame.Template
 	 local LocalFrame = ChatHUD.LocalFrame
@@ -955,7 +967,6 @@ function _isnetworkowner(Part)
 end
 
 function Align(Part1,name,cf)
-	if not cf then cf=CFrame.identity end 
 	local con;con=game:GetService("RunService").PostSimulation:Connect(function()
 		pcall(function()
 			if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
@@ -976,7 +987,7 @@ function findMeshID(id,hatname,alreadyfound)
 			end
 		end
 	end
-    return nil
+    return "Head"
 end
 
 function filterMeshID(id)
@@ -991,20 +1002,20 @@ for i,v in next, plr.Character.Humanoid:GetAccessories() do
 	local handle = v:FindFirstChild("Handle") if not handle then continue end
 	local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
 	local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
-	if limbName==nil then else alreadyfound[limbName]=true end
+	if limbName==nil then continue else alreadyfound[limbName]=true end
 	if limbName=="Head" then handle.Transparency=1 end
 	if limbName=="Torso" then handle.Transparency=1 end
 	handle.CanQuery = false
 	handle.CanTouch = false
-	Align(handle, limbName, index and getgenv().accoffsets[limbName][index] or CFrame.identity)
+	local hatattcf = (handle:FindFirstChildOfClass("Attachment") or {CFrame=CFrame.new(0,0,0)}).CFrame
+	Align(handle, limbName, (limbName == "Head" and CFrame.new(-hatattcf.Position.X,-hatattcf.Position.Y,-hatattcf.Position.Z)) or getgenv().accoffsets[limbName][index])
 end
 plr.CharacterAdded:Connect(function()
 	local char = workspace:WaitForChild(plr.Name,0.5);if not char then return end
 	local hrp = char:WaitForChild("HumanoidRootPart")
 	local hum = char:WaitForChild("Humanoid")
-	task.wait(0.2)
-	hrp.CFrame=VirtualBody.HumanoidRootPart.CFrame*CFrame.new(15,0,15)
-	task.wait(0.05)
+	task.wait(0.25)
+	hrp.CFrame=VirtualBody.HumanoidRootPart.CFrame*CFrame.new(15,-15,15)
 	for i,v in next, hrp:GetChildren() do if v:IsA("Sound") then v.Volume = 0 end end
 	hum.Health = 0
 	local alreadyfound = {}
@@ -1012,12 +1023,13 @@ plr.CharacterAdded:Connect(function()
 		local handle = v:FindFirstChild("Handle") if not handle then continue end
 		local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
 		local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
-		if limbName==nil then else alreadyfound[limbName]=true end
+		if limbName==nil then continue else alreadyfound[limbName]=true end
 		if limbName=="Head" then handle.Transparency=1 end
 		if limbName=="Torso" then handle.Transparency=1 end
 		handle.CanQuery = false
 		handle.CanTouch = false
-		Align(handle, limbName, index and getgenv().accoffsets[limbName][index] or CFrame.identity)
+		local hatattcf = (handle:FindFirstChildOfClass("Attachment") or {CFrame=CFrame.new(0,0,0)}).CFrame
+		Align(handle, limbName, (limbName == "Head" and CFrame.new(-hatattcf.Position.X,-hatattcf.Position.Y,-hatattcf.Position.Z)) or getgenv().accoffsets[limbName][index])
 	end
 end)
 Script()
