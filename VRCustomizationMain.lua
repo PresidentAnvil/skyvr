@@ -719,10 +719,10 @@ repeat task.wait() until not Popup.Visible;
 ((global.skyvrsettings.fullbody and PreviewCharacter) or PreviewLimbs).Parent = Preview
 PreviewHatsFolder.Parent = Preview
 Preview.CurrentCamera = camera
+camera.CameraType = "Scriptable"
 camera.CFrame = CFrame.new(-28.55,4,8) * CFrame.Angles(0,math.pi,0)
-camera.Focus = CFrame.new(-28.698, 3.226, 11.112)
+camera.Focus = CFrame.new(0,0,0)
 camera.HeadLocked = true
-camera.CameraType = "Fixed"
 camera.DiagonalFieldOfView = 88.877
 camera.FieldOfView = 70
 camera.FieldOfViewMode = "Vertical"
