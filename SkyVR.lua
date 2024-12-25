@@ -94,7 +94,7 @@ t:TweenSize(UDim2.new(0,0,1,0),nil,Enum.EasingStyle.Linear,0)
 wait(0.01)
 t:TweenSize(UDim2.new(0.3,0,1,0),nil,Enum.EasingStyle.Linear,0.8)
 wait(0.81)
-if not game:GetService("UserInputService").VREnabled and not getgenv().fullbody then
+if game:GetService("UserInputService").VREnabled and not getgenv().fullbody then
 	errorr.Visible = true
 	t.Parent.Visible = false
 	wait(5)
@@ -162,212 +162,80 @@ local rfirst = true
 local ltoypos = CFrame.new(1.15,0,0) * CFrame.Angles(0,math.rad(180),0)
 local rtoypos = CFrame.new(1.15,0,0) * CFrame.Angles(0,math.rad(0),0)
 
-function findMeshID(char,id)
-	id = string.match(id,"%d+")
-	for i,v in char:GetChildren() do
-		if v:IsA("Accessory") then
-			local handle = v.Handle
-
-			if handle:IsA("MeshPart") then
-				local pooped = string.match(handle.MeshId,"%d+")
-				if string.find(handle.MeshId,'assetdelivery') then
-					pooped=string.match(string.sub(handle.MeshId,37,#handle.MeshId),"%d+")
-				end
-				if id == pooped then
-					return v
-				end
-			else
-				local mesh = handle:FindFirstChildOfClass("SpecialMesh")
-				local pooped = string.match(mesh.MeshId,"%d+")
-				if string.find(mesh.MeshId,'assetdelivery') then
-					pooped=string.match(string.sub(mesh.MeshId,37,#mesh.MeshId),"%d+")
-				end
-				if id == pooped then
-					return v
-				end
-			end
-		end
-	end
-
-	return nil
+function Align(Part1,Part0,CFrameOffset) 
+    local AlignPos = Instance.new('AlignPosition', Part1);
+    AlignPos.Parent.CanCollide = false;
+    AlignPos.ApplyAtCenterOfMass = true;
+    AlignPos.MaxForce = 67752;
+    AlignPos.MaxVelocity = math.huge/9e110;
+    AlignPos.ReactionForceEnabled = false;
+    AlignPos.Responsiveness = 200;
+    AlignPos.RigidityEnabled = false;
+    local AlignOri = Instance.new('AlignOrientation', Part1);
+    AlignOri.MaxAngularVelocity = math.huge/9e110;
+    AlignOri.MaxTorque = 67752;
+    AlignOri.PrimaryAxisOnly = false;
+    AlignOri.ReactionTorqueEnabled = false;
+    AlignOri.Responsiveness = 200;
+    AlignOri.RigidityEnabled = false;
+    local AttachmentA=Instance.new('Attachment',Part1);
+    local AttachmentB=Instance.new('Attachment',Part0);
+    AttachmentB.CFrame = AttachmentB.CFrame * CFrameOffset
+    AlignPos.Attachment0 = AttachmentA;
+    AlignPos.Attachment1 = AttachmentB;
+    AlignOri.Attachment0 = AttachmentA;
+    AlignOri.Attachment1 = AttachmentB;
+    return {AttachmentB,AlignOri,AlignPos}
 end
 
-local function FEScript(char)		
-	local function Align(Part1,Part0,CFrameOffset) 
-		local AlignPos = Instance.new('AlignPosition', Part1);
-		AlignPos.Parent.CanCollide = false;
-		AlignPos.ApplyAtCenterOfMass = true;
-		AlignPos.MaxForce = 67752;
-		AlignPos.MaxVelocity = math.huge/9e110;
-		AlignPos.ReactionForceEnabled = false;
-		AlignPos.Responsiveness = 200;
-		AlignPos.RigidityEnabled = false;
-		local AlignOri = Instance.new('AlignOrientation', Part1);
-		AlignOri.MaxAngularVelocity = math.huge/9e110;
-		AlignOri.MaxTorque = 67752;
-		AlignOri.PrimaryAxisOnly = false;
-		AlignOri.ReactionTorqueEnabled = false;
-		AlignOri.Responsiveness = 200;
-		AlignOri.RigidityEnabled = false;
-		local AttachmentA=Instance.new('Attachment',Part1);
-		local AttachmentB=Instance.new('Attachment',Part0);
-		AttachmentB.CFrame = AttachmentB.CFrame * CFrameOffset
-		AlignPos.Attachment0 = AttachmentA;
-		AlignPos.Attachment1 = AttachmentB;
-		AlignOri.Attachment0 = AttachmentA;
-		AlignOri.Attachment1 = AttachmentB;
-		return {AttachmentB,AlignOri,AlignPos}
-	end
-	if not char:FindFirstChild(global.left) and string.sub(global.left,0,7) ~= "meshid:" then
-		errorr.Text = "Cannot find accessory '"..global.left.."' (left)"
-		errorr.Visible = true
-		t.Parent.Visible = false
-		task.delay(5,function()
-			loader:Destroy()
-		end)
-		error("Cannot find accessory '"..global.left.."' (left)")
-	end
-	if string.sub(global.left,0,7) == "meshid:" then
-		if findMeshID(char,string.sub(global.left,7,#global.left)) == nil then
-			errorr.Text = "Cannot find accessory '"..global.left.."' (left)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.left.."' (left)")
-		end
-	end
-	if not char:FindFirstChild(global.right) and string.sub(global.right,0,7) ~= "meshid:" then 
-		errorr.Text = "Cannot find accessory '"..global.right.."' (right)"
-		errorr.Visible = true
-		t.Parent.Visible = false
-		task.delay(5,function()
-			loader:Destroy()
-		end)
-		error("Cannot find accessory '"..global.right.."' (right)")
-	end
-	if string.sub(global.right,0,7) == "meshid:" then
-		if findMeshID(char,string.sub(global.right,7,#global.right)) == nil then
-			errorr.Text = "Cannot find accessory '"..global.right.."' (right)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.right.."' (right)")
-		end
-	end
-	for i,v in global.headhats do
-		if not char:FindFirstChild(i) and string.sub(i,0,7) ~= "meshid:" then 
-			errorr.Text = "Cannot find accessory '"..i.."' (headhat)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..i.."' (headhat)")
-		end
-		if string.sub(i,0,7) == "meshid:" then
-			if findMeshID(char,string.sub(i,7,#i)) == nil then
-				errorr.Text = "Cannot find accessory '"..i.."' (right)"
-				errorr.Visible = true
-				t.Parent.Visible = false
-				task.delay(5,function()
-					loader:Destroy()
-				end)
-				error("Cannot find accessory '"..i.."' (right)")
-			end
-		end
-	end
-	if not char:FindFirstChild(global.options.rightToy) and string.sub(global.options.rightToy,0,7) ~= "meshid:" then 
-		if not global.options.rightToy == "" then 
-			errorr.Text = "Cannot find accessory '"..global.options.rightToy.."' (rightToy)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.options.rightToy.."' (rightToy)")
-		end
-	end
-	if string.sub(global.options.rightToy,0,7) == "meshid:" then
-		if findMeshID(char,string.sub(global.options.rightToy,7,#global.options.rightToy)) == nil then
-			errorr.Text = "Cannot find accessory '"..global.options.rightToy.."' (rightToy)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.options.rightToy.."' (rightToy)")
-		end
-	end
-	if not char:FindFirstChild(global.options.leftToy) and string.sub(global.options.leftToy,0,7) ~= "meshid:" then 
-		if not global.options.leftToy == "" then 
-			errorr.Text = "Cannot find accessory '"..global.options.leftToy.."' (leftToy)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.options.leftToy.."' (leftToy)")
-		end
-	end
-	if string.sub(global.options.leftToy,0,7) == "meshid:" then
-		if findMeshID(char,string.sub(global.options.leftToy,7,#global.options.leftToy)) == nil then
-			errorr.Text = "Cannot find accessory '"..global.options.leftToy.."' (leftToy)"
-			errorr.Visible = true
-			t.Parent.Visible = false
-			task.delay(5,function()
-				loader:Destroy()
-			end)
-			error("Cannot find accessory '"..global.options.leftToy.."' (leftToy)")
-		end
-	end
-	pcall(function()
-		if string.sub(global.left,0,7) == "meshid:" then
-			local leftallign = Align(findMeshID(char,string.sub(global.left,7,#global.left)).Handle,lefthandpart,CFrame.new())
-			return
-		end
-		local leftallign = Align(char[global.left].Handle,lefthandpart,CFrame.new())
-	end)
-	pcall(function()
-		if string.sub(global.right,0,7) == "meshid:" then
-			local rightallign = Align(findMeshID(char,string.sub(global.right,7,#global.right)).Handle,righthandpart,CFrame.new())
-			return
-		end
-		local rightallign = Align(char[global.right].Handle,righthandpart,CFrame.new())
-	end) 
-    pcall(function()
-        if global.options.leftToy == "" then return end
-		if string.sub(global.options.leftToy,0,7) == "meshid:" then
-			local rightallign = Align(findMeshID(char,string.sub(global.options.leftToy,7,#global.options.leftToy)).Handle,lefttoypart,CFrame.new())
-			return
-		end
-		local rightallign = Align(char[global.options.leftToy].Handle,lefttoypart,CFrame.new())
-	end)
-	pcall(function()
-        if global.options.rightToy == "" or global.options.rightToy == nil then return end
-		if string.sub(global.options.rightToy,0,7) == "meshid:" then
-			local rightallign = Align(findMeshID(char,string.sub(global.options.rightToy,7,#global.options.rightToy)).Handle,righttoypart,CFrame.new())
-			return
-		end
-		local rightallign = Align(char[global.options.rightToy].Handle,righttoypart,CFrame.new())
-	end)
-	for i,v in global.headhats do
-		pcall(function()
-			local hatname = i
-			if string.sub(hatname,0,7) == "meshid:" then
-				local offset = v
-				local hat = findMeshID(char,string.sub(hatname,7,#hatname))
-				local headallign = Align(hat.Handle,headpart,offset)
-				hat.Handle.Transparency = global.options.HeadHatTransparency
-				return
-			end
-			local offset = v
-			local headallign = Align(char[hatname].Handle,headpart,offset)
-            char[i].Handle.Transparency = global.options.HeadHatTransparency
-		end)
+
+function filterMeshID(id)
+    return (string.find(id,'assetdelivery')~=nil and string.match(string.sub(id,37,#id),"%d+")) or string.match(id,"%d+")
+end
+
+function findMeshID(id)
+    for i,v in pairs(getgenv().headhats) do
+        if i=="meshid:"..id then return true,headpart,v end
+    end
+    if getgenv().right=="meshid:"..id then return  true,righthandpart,CFrame.new() end
+    if getgenv().left=="meshid:"..id then return   true,lefthandpart,CFrame.new() end
+    if options.leftToy=="meshid:"..id then return  true,lefttoypart,CFrame.new() end
+    if options.rightToy=="meshid:"..id then return true,righttoypart,CFrame.new() end
+    return false
+end
+
+function findHatName(id)
+    for i,v in pairs(getgenv().headhats) do
+        if i==id then return true,headpart,v end
+    end
+    if getgenv().right==id then return  true,righthandpart,CFrame.new() end
+    if getgenv().left==id then return   true,lefthandpart,CFrame.new() end
+    if options.leftToy==id then return  true,lefttoypart,CFrame.new() end
+    if options.rightToy==id then return true,righttoypart,CFrame.new() end
+    return false
+end
+
+local function FEScript(char)
+
+	local foundmeshids = {}
+	for i,v in ipairs(char:GetDescendants()) do
+		if not v:IsA"Accessory" then continue end
+		if not v:FindFirstChild"Handle" then continue end
+		local mesh = v.Handle:FindFirstChildOfClass("SpecialMesh")
+        if not v.Handle:FindFirstChildOfClass("SpecialMesh") then mesh = v.Handle end
+        
+        local is,d,cf = findMeshID(filterMeshID(mesh.MeshId))
+	    if foundmeshids["meshid:"..filterMeshID(mesh.MeshId)] then is = false else foundmeshids["meshid:"..filterMeshID(mesh.MeshId)] = true end
+	
+        if is then
+            Align(v.Handle,d,cf)
+            v.Handle.Transparency = (d.Name=="moveH" and global.options.HeadHatTransparency) or 0
+        else
+            local is,d,cf = findHatName(v.Name)
+	    	if not is then continue end
+            Align(v.Handle,d,cf)
+            v.Handle.Transparency = (d.Name=="moveH" and global.options.HeadHatTransparency) or 0
+        end
 	end
 end
 
@@ -411,10 +279,7 @@ do
 				v.Volume = 0
 			end
 		end
-		if head then
-			head:Destroy()
-		end
-		hum.Health = 0
+		char.Humanoid.Health = 0
 
 		FEScript(char)
 	end)
@@ -429,14 +294,14 @@ end)
 coroutine.wrap(function()
 	local cam = workspace.CurrentCamera
 	cam:GetPropertyChangedSignal("CFrame"):Connect(function()
-		cam.CameraType = "Scriptable"
-		cam.HeadScale = global.options.headscale
+		--cam.CameraType = "Scriptable"
+		--cam.HeadScale = global.options.headscale
 	end)
 end)()
 local cam = workspace.CurrentCamera
 
-cam.CameraType = "Scriptable"
-cam.HeadScale = global.options.headscale
+--cam.CameraType = "Scriptable"
+--cam.HeadScale = global.options.headscale
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 

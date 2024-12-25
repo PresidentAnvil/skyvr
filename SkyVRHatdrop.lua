@@ -90,7 +90,7 @@ function getAllHats(Character)
         if not v.Handle:FindFirstChildOfClass("SpecialMesh") then continue end
         
         local is,d = findMeshID(filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId))
-	if foundmeshids["meshid:"..filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)] then is = false else foundmeshids["meshid:"..filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)] = true end
+	    if foundmeshids["meshid:"..filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)] then is = false else foundmeshids["meshid:"..filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)] = true end
 	
         if is then
             table.insert(allhats,{v,d,"meshid:"..filterMeshID(v.Handle:FindFirstChildOfClass("SpecialMesh").MeshId)})
