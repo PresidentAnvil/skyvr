@@ -1,3 +1,4 @@
+
 -- sky vr
 
 
@@ -94,7 +95,7 @@ t:TweenSize(UDim2.new(0,0,1,0),nil,Enum.EasingStyle.Linear,0)
 wait(0.01)
 t:TweenSize(UDim2.new(0.3,0,1,0),nil,Enum.EasingStyle.Linear,0.8)
 wait(0.81)
-if game:GetService("UserInputService").VREnabled and not getgenv().fullbody then
+if not game:GetService("UserInputService").VREnabled and not getgenv().fullbody then
 	errorr.Visible = true
 	t.Parent.Visible = false
 	wait(5)
@@ -294,14 +295,14 @@ end)
 coroutine.wrap(function()
 	local cam = workspace.CurrentCamera
 	cam:GetPropertyChangedSignal("CFrame"):Connect(function()
-		--cam.CameraType = "Scriptable"
-		--cam.HeadScale = global.options.headscale
+		cam.CameraType = "Scriptable"
+		cam.HeadScale = global.options.headscale
 	end)
 end)()
 local cam = workspace.CurrentCamera
 
---cam.CameraType = "Scriptable"
---cam.HeadScale = global.options.headscale
+cam.CameraType = "Scriptable"
+cam.HeadScale = global.options.headscale
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
 
