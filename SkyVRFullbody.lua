@@ -1,5 +1,4 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/PresidentAnvil/HatdropReanimation/main/Valuable%20Dependencies/thething.lua"))()
-local StudsOffset = 0.1
 local ChatEnabled = true
 local ChatLocalRange = 70
 local ViewportEnabled = true
@@ -40,6 +39,7 @@ local Camera = workspace.CurrentCamera
 
 local VRService = game:GetService("VRService")
 local VRReady = VRService.VREnabled
+local StudsOffset = 0.1 - ((VRReady and 1.5) or 0)
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
