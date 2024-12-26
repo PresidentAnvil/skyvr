@@ -23,39 +23,28 @@ local FootPlacementSettings = {
 	LeftOffset = Vector3.new(-.5, 0, 0),
 }
 
---|| Script:
 
 local Script = nil;
 local limbCFs = {}
 local VirtualBody
--- My coding style changed throughout this a lot lol
-
+local VirtualRig
+local righttoyalign
 Script = function()
 
---[[
-	Variables
---]]
-
 local Players = game:GetService("Players")
- local Client = Players.LocalPlayer
-  local Character = Client.Character or Client.CharacterAdded:Wait()
-   local WeldBase = Character:WaitForChild("HumanoidRootPart")
-  local Mouse = Client:GetMouse()
-
+local Client = Players.LocalPlayer
+local Character = Client.Character or Client.CharacterAdded:Wait()
+local WeldBase = Character:WaitForChild("HumanoidRootPart")
+local Mouse = Client:GetMouse()
 local Camera = workspace.CurrentCamera
 
 local VRService = game:GetService("VRService")
- local VRReady = VRService.VREnabled
+local VRReady = VRService.VREnabled
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local HttpService = game:GetService("HttpService")
-local StarterGui = game:GetService("StarterGui")	
+local StarterGui = game:GetService("StarterGui")
 
-local HeadAccessories = {};
-local UsedAccessories = {};
-
-local Pointer = false;
 local Point1 = false;
 local Point2 = false;
 
@@ -69,18 +58,27 @@ Anchor.Transparency = 1
 Anchor.CanCollide = false
 Anchor.Parent = workspace
 
+righttoypart = Instance.new("Part")
+lefttoypart = Instance.new("Part")
+
+righttoypart.Parent = workspace
+righttoypart.CFrame = WeldBase.CFrame
+righttoypart.Size = Vector3.new(1,1,1)
+righttoypart.Transparency = 1
+righttoypart.CanCollide = false
+righttoypart.Anchored = true
+righttoypart.Name = "rtoy"
+lefttoypart.Parent = workspace
+lefttoypart.CFrame = WeldBase.CFrame
+lefttoypart.Size = Vector3.new(1,1,1)
+lefttoypart.Transparency = 1
+lefttoypart.CanCollide = false
+lefttoypart.Anchored = true
+lefttoypart.Name = "ltoy"
+
 StarterGui:SetCore("VRLaserPointerMode", 3)
 
---[[
-	Character Protection
---]]
-
 local CharacterCFrame = WeldBase.CFrame
-
-
---[[
-	Functions
---]]
 
 function Tween(Object, Style, Direction, Time, Goal)
     local tweenInfo = TweenInfo.new(Time, Enum.EasingStyle[Style], Enum.EasingDirection[Direction])
@@ -168,10 +166,6 @@ local function CreateRightGrip(Handle)
 
 end
 
---[[
-	Movement
---]]
-
 VirtualRig.Name = "VirtualRig"
 VirtualRig.RightFoot.BodyPosition.Position = CharacterCFrame.p
 VirtualRig.LeftFoot.BodyPosition.Position = CharacterCFrame.p
@@ -180,7 +174,6 @@ VirtualRig:SetPrimaryPartCFrame(CharacterCFrame)
 
 VirtualRig.Humanoid.Health = 0
 VirtualRig:BreakJoints()
---
 
 VirtualBody.Parent = workspace
 VirtualBody.Name = "VirtualBody"
@@ -312,29 +305,34 @@ coroutine.wrap(function()
     end 
 end)()
 
-triggerPressure = 0
 UserInputService.InputChanged:Connect(function(inputObject)
 	if inputObject.KeyCode == Enum.KeyCode.Thumbstick1 then
-	  lastjoystickPosition = joystickPosition
+		lastjoystickPosition = joystickPosition
 	  joystickPosition = inputObject.Position
 	end
 end)
 
-UserInputService.InputChanged:Connect(function(input,gpe)
-	if input.KeyCode == Enum.KeyCode.ButtonR2 then
-		triggerPressure = input.Position.Z
-	end
-end)
-
+local rtoypos = CFrame.new()
+rfirst=true
+holdingright=false
 UserInputService.InputBegan:Connect(function(input,gpe)
 	if input.KeyCode == Enum.KeyCode.ButtonA then
 		VirtualBody.Humanoid.Jump = true
 	end
+	if input.KeyCode == Enum.KeyCode.ButtonB then
+		if not rfirst then
+			rtoypos = righttoypart.CFrame:ToObjectSpace(limbCFs.RightArm):Inverse()
+		end
+		rfirst = false
+		holdingright = not holdingright
+	end
 end)
-VirtualBody.Humanoid.WalkSpeed = 10
+VirtualBody.Humanoid.WalkSpeed = 18
 
 if VRReady then 
 	RunService.Stepped:Connect(function()
+		if not lastjoystickPosition then return end
+		if not joystickPosition then return end
 		if lastjoystickPosition.Magnitude == joystickPosition.Magnitude then VirtualBody.Humanoid:Move(Vector3.zero) return end
 		lastjoystickPosition = joystickPosition
 		local headCFrame = limbCFs.Head
@@ -517,7 +515,9 @@ local function OnUserCFrameChanged(UserCFrame, Positioning, IgnoreTorso)
 		
 	elseif UserCFrame == Enum.UserCFrame.RightHand and VRReady then
 		VirtualRig.RightHand.CFrame = Positioning
-		
+		if holdingright then
+			righttoypart.CFrame = Positioning * rtoypos
+		end
 	elseif UserCFrame == Enum.UserCFrame.LeftHand and VRReady then
 		VirtualRig.LeftHand.CFrame = Positioning
 	end
@@ -970,18 +970,29 @@ function _isnetworkowner(Part)
 	return Part.ReceiveAge == 0
 end
 
-function Align(Part1,name,cf)
+function Align(Part1,name,cf,velocity)
+	if not velocity then velocity = Vector3.new(20,20,20) end
+	local doit = true
 	local con;con=game:GetService("RunService").PostSimulation:Connect(function()
-		pcall(function()
-			if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
-			if not _isnetworkowner(Part1) then return end
-			Part1.CFrame=limbCFs[name]*cf
-			Part1.Velocity = Vector3.new(20,20,20)
-		end)
+		if not doit then return end
+		if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
+		if not _isnetworkowner(Part1) then return end
+		Part1.Velocity = velocity
+		Part1.CFrame=(((typeof(name) == "string") and limbCFs[name]) or name.CFrame)*cf
+		Part1.CanQuery = false
+		Part1.CanTouch = false
+		Part1.CanCollide = false
 	end)
+	return {Set=function(self,a) doit=a end,Disconnect=con.Disconnect}
 end
 
 function findMeshID(id,hatname,alreadyfound)
+	if getgenv().options.leftToy == "meshid"..id or getgenv().options.leftToy == hatname then
+		return "lefttoy",getgenv().options.leftToy:find("meshid:")
+	end
+	if getgenv().options.rightToy == "meshid"..id or getgenv().options.rightToy == hatname then
+		return "righttoy",getgenv().options.rightToy:find("meshid:")
+	end
 	for i,v in pairs(AccessorySettings) do
 		if typeof(v)~='table' then continue end
 		if alreadyfound[i]==true then continue end
@@ -1010,13 +1021,41 @@ local ExtraParts = {
 }
 Script()
 for i,v in next, plr.Character.HumanoidRootPart:GetChildren() do if v:IsA("Sound") then v.Volume = 0 end end
+local toolcons = {}
+for i,v in plr.Backpack:GetChildren() do 
+	local w = Instance.new("Weld") 	
+	w.Name = "RightGrip" 	
+	w.Parent = plr.Character["Right Arm"] 	
+	w.Part0 = w.Parent 	
+	w.Part1 = v.Handle 	
+	v.Parent = plr.Character 	
+	task.wait(0.03) 	
+	w:Destroy() 
+	v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
+	toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2),Vector3.new(99999,99999,99999))
+end
+plr.Character.ChildAdded:Connect(function(tool: Tool)
+	if tool:IsA("Tool") then
+		if toolcons[tool.Name] then toolcons[tool.Name]:Set(true) return end
+	end
+end)
+plr.Character.ChildRemoved:Connect(function(tool: Tool)
+	if tool:IsA("Tool") then
+		toolcons[tool.Name]:Set(false)
+	end
+end)
 plr.Character.Humanoid.Health = 0
 local alreadyfound = {}
 for i,v in next, plr.Character.Humanoid:GetAccessories() do
 	local handle = v:FindFirstChild("Handle") if not handle then continue end
 	local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
 	local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
-	if limbName==nil then continue else alreadyfound[limbName]=true end
+	alreadyfound[limbName]=true
+	if ("meshid:"..id)==getgenv().options.rightToy then
+		Align(handle,(righttoypart),CFrame.new())
+		continue
+	end
+	handle.Transparency=getgenv().options.limbTransparency
 	if limbName=="Head" then handle.Transparency=1 end
 	if limbName=="Torso" then handle.Transparency=1 end
 	handle.CanQuery = false
@@ -1031,21 +1070,51 @@ for i,v in next, plr.Character.Humanoid:GetAccessories() do
 	end
 	Align(handle, limbName, (((limbName == "Head") or washead) and (washead and CFrame.Angles(-math.pi/2,0,0)*headcf.CFrame*hatattcf.CFrame:Inverse() or headcf.CFrame*hatattcf.CFrame:Inverse())) or getgenv().accoffsets[limbName][index])
 end
-plr.CharacterAdded:Connect(function()
-	local char = workspace:WaitForChild(plr.Name,0.5);if not char then return end
+plr.CharacterAdded:Connect(function(char)
 	local hrp = char:WaitForChild("HumanoidRootPart")
 	local hum = char:WaitForChild("Humanoid")
 	task.wait(0.25)
 	hrp.CFrame=VirtualBody.HumanoidRootPart.CFrame*CFrame.new(15,-15,15)
 	task.wait(0.15)
 	for i,v in next, hrp:GetChildren() do if v:IsA("Sound") then v.Volume = 0 end end
+	local toolcons = {}
+	for i,v in plr.Backpack:GetChildren() do 
+		local w = Instance.new("Weld") 	
+		w.Name = "RightGrip" 	
+		w.Parent = char["Right Arm"] 	
+		w.Part0 = w.Parent 	
+		w.Part1 = v.Handle 	
+		v.Parent = char 	
+		task.wait(0.03) 	
+		w:Destroy() 
+		v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
+		toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2),Vector3.new(99999,99999,99999))
+	end
+	char.ChildAdded:Connect(function(tool: Tool)
+		if tool:IsA("Tool") then
+			if toolcons[tool.Name] then toolcons[tool.Name]:Set(true) return end
+		end
+	end)
+	char.ChildRemoved:Connect(function(tool: Tool)
+		if tool:IsA("Tool") then
+			toolcons[tool.Name]:Set(false)
+		end
+	end)
 	hum.Health = 0
+
+
+
 	local alreadyfound = {}
 	for i,v in next, hum:GetAccessories() do
 		local handle = v:FindFirstChild("Handle") if not handle then continue end
 		local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
 		local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
-		if limbName==nil then continue else alreadyfound[limbName]=true end
+		alreadyfound[limbName]=true
+		if ("meshid:"..id)==getgenv().options.rightToy then
+			Align(handle,(righttoypart),CFrame.new())
+			continue
+		end
+		handle.Transparency=getgenv().options.limbTransparency
 		if limbName=="Head" then handle.Transparency=1 end
 		if limbName=="Torso" then handle.Transparency=1 end
 		handle.CanQuery = false
