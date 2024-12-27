@@ -1,4 +1,5 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/PresidentAnvil/HatdropReanimation/main/Valuable%20Dependencies/thething.lua"))()
+local StudsOffset = 0.1-1.5
 local ChatEnabled = true
 local ChatLocalRange = 70
 local ViewportEnabled = true
@@ -39,7 +40,6 @@ local Camera = workspace.CurrentCamera
 
 local VRService = game:GetService("VRService")
 local VRReady = VRService.VREnabled
-local StudsOffset = 0.1 - ((VRReady and 1.5) or 0)
 
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -981,7 +981,7 @@ function Align(Part1,name,cf,velocity)
 		Part1.CFrame=(((typeof(name) == "string") and limbCFs[name]) or name.CFrame)*cf
 		Part1.CanQuery = false
 		Part1.CanTouch = false
-		Part1.CanCollide = false
+		Part1.CanCollide = falsea
 	end)
 	return {Set=function(self,a) doit=a end,Disconnect=con.Disconnect}
 end
@@ -1032,7 +1032,7 @@ for i,v in plr.Backpack:GetChildren() do
 	task.wait(0.03) 	
 	w:Destroy() 
 	v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
-	toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2),Vector3.new(99999,99999,99999))
+	toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2))
 end
 plr.Character.ChildAdded:Connect(function(tool: Tool)
 	if tool:IsA("Tool") then
@@ -1088,7 +1088,7 @@ plr.CharacterAdded:Connect(function(char)
 		task.wait(0.03) 	
 		w:Destroy() 
 		v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
-		toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2),Vector3.new(99999,99999,99999))
+		toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2))
 	end
 	char.ChildAdded:Connect(function(tool: Tool)
 		if tool:IsA("Tool") then
