@@ -824,6 +824,7 @@ ViewHUDFunc = function()
 	 local CameraPort = Camera.CFrame
 	
 	local ViewHUD = script:FindFirstChild("ViewHUD") or game:GetObjects("rbxassetid://4649974000")[1]
+	ViewHUD.ResetOnSpawn = false
 	 local Viewport = ViewHUD.Viewport
 	  local Viewcam = Instance.new("Camera")
 	 local ViewPart = ViewHUD.Part
@@ -955,7 +956,7 @@ ViewHUDFunc = function()
 		
 		CameraPort = CFrame.new(Render.p + Vector3.new(5, 2, 0), Render.p)
 		
-		Viewport.Camera.CFrame = CameraPort
+		--Viewport.Camera.CFrame = CameraPort
 		
 		ViewPart.CFrame = Render * CFrame.new(0, 0, -16)
 		
