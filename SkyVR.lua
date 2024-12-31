@@ -112,7 +112,7 @@ if getgenv().skyVRversion ~= '2.2.0' then
 end
 t:TweenSize(UDim2.new(1,0,1,0),nil,Enum.EasingStyle.Linear,0.1)
 wait(0.06)
-if getgenv().HATDROP then
+if getgenv().HATDROP and not getgenv().fullbody then
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/presidentanvil/skyvr/main/SkyVRHatdrop.lua"))()
 	TextLabel.Text = "Ready!"
 	task.delay(5,function()
