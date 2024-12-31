@@ -102,7 +102,7 @@ if not game:GetService("UserInputService").VREnabled and not getgenv().fullbody 
 	loader:Destroy()
 	return
 end
-if getgenv().skyVRversion ~= '2.2.0' then
+if getgenv().skyVRversion ~= '3.0.0' then
 	errorr.Text = "Please update your script loader!"
 	errorr.Visible = true
 	t.Parent.Visible = false
