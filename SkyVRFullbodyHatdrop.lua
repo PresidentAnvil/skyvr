@@ -1,4 +1,5 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/PresidentAnvil/HatdropReanimation/main/Valuable%20Dependencies/thething.lua"))()
+pcall(function()loader:Destroy()end)
 local fpdh = workspace.FallenPartsDestroyHeight
 local StudsOffset = 0.1
 local ChatEnabled = true
@@ -956,7 +957,7 @@ ViewHUDFunc = function()
 		
 		CameraPort = CFrame.new(Render.p + Vector3.new(5, 2, 0), Render.p)
 		
-		--Viewport.Camera.CFrame = CameraPort
+		Viewport.Camera.CFrame = CameraPort
 		
 		ViewPart.CFrame = Render * CFrame.new(0, 0, -16)
 		
