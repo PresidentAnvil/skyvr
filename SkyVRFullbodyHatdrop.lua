@@ -1,27 +1,3 @@
-getgenv().headhats = { ["Accessory (Toorso)"] = CFrame.Angles(-math.pi/2, 0, 0)}
-getgenv().right = "meshid:117287001096396"
-getgenv().left = "Accessory (RARM)"
-getgenv().HATDROP = false
-getgenv().fullbody = true
-getgenv().options = {
-	dontfling = false,
-	righthandrotoffset = Vector3.new(-90, 0, 0),
-	lefthandrotoffset = Vector3.new(-90, 0, 0),
-	headscale = 3,
-	rightleg = "Accessory (LARM)",
-	leftleg = "Accessory (LLEG)",
-	rightlegrotoffset = Vector3.new(-90, 0, 0),
-	leftlegrotoffset = Vector3.new(-90, 0, 0),
-	NetVelocity = Vector3.new(20,20,20), -- if your hands and head keep falling set these to higher numbers
-	controllerRotationOffset = Vector3.new(180,180,0),
-	HeadHatTransparency = 1,
-	leftToyBind = Enum.KeyCode.ButtonY,
-	rightToyBind = Enum.KeyCode.ButtonB,
-	leftToy = "", -- default is "" or nil
-	rightToy = "meshid:18239850115", -- default is "" or nil
-}
-getgenv().skyVRversion = '2.2.0'
-
 loadstring(game:HttpGet("https://raw.githubusercontent.com/PresidentAnvil/HatdropReanimation/main/Valuable%20Dependencies/thething.lua"))()
 local fpdh = workspace.FallenPartsDestroyHeight
 local StudsOffset = 0.1
