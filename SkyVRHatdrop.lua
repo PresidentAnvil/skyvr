@@ -1,8 +1,3 @@
--- sourced from https://github.com/presidentanvil/hatdropreanimation
-cfn=CFrame.new
-cfa=CFrame.Angles
-r=math.rad
-
 local function createpart(size, name,h)
 	local Part = Instance.new("Part")
 	Part.Parent = workspace
@@ -79,7 +74,10 @@ function Align(Part1,Part0,cf,isflingpart)
         if not _isnetworkowner(Part1) then return end
         Part1.CanCollide=false
         Part1.CFrame=Part0.CFrame*cf
+        Part1.Velocity = velocity or Vector3.new(20,20,20)
     end)
+
+    return {SetVelocity = function(self,v) velocity=v end,SetCFrame = function(self,v) cf=v end,}
 end
 
 function getAllHats(Character)
@@ -104,55 +102,43 @@ function getAllHats(Character)
 end
 
 function HatdropCallback(Character, callback)
+    Character:WaitForChild("Humanoid")
+    Character:WaitForChild("HumanoidRootPart")
+	task.wait(0.4)
     local AnimationInstance = Instance.new("Animation");AnimationInstance.AnimationId = "rbxassetid://35154961"
-
 	workspace.FallenPartsDestroyHeight = 0/0
     local hrp = Character.HumanoidRootPart
-    local torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("LowerTorso")
-    local startCF = headpart.CFrame
-    hrp.CFrame=startCF*cfn(math.random(-6,6),0,math.random(-6,6))
-    task.wait(.1)
+    local startCF = Character.HumanoidRootPart.CFrame
+	local torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("LowerTorso")
     local Track = Character.Humanoid.Animator:LoadAnimation(AnimationInstance)
     Track:Play()
     Track.TimePosition = 3.24
     Track:AdjustSpeed(0)
-    
-    local allhats = getAllHats(Character)
-    
     local locks = {}
-    for i,v in pairs(allhats) do
-        table.insert(locks,v[1].Changed:Connect(function(p)
+    for i,v in pairs(Character.Humanoid:GetAccessories()) do
+        table.insert(locks,v.Changed:Connect(function(p)
             if p == "BackendAccoutrementState" then
-                sethiddenproperty(v[1],"BackendAccoutrementState",0)
+                sethiddenproperty(v,"BackendAccoutrementState",0)
             end
         end))
-        sethiddenproperty(v[1],"BackendAccoutrementState",2)
+        sethiddenproperty(v,"BackendAccoutrementState",2)
     end
-    
-    local c;c=ps:Connect(function()
+    local c;c=game:GetService("RunService").PostSimulation:Connect(function()
         if(not Character:FindFirstChild("HumanoidRootPart"))then c:Disconnect()return;end
         
         hrp.Velocity = Vector3.new(0,0,25)
         hrp.RotVelocity = Vector3.new(0,0,0)
-        hrp.CFrame = cfn(startCF.X,fpdh+.25,startCF.Z) * cfa(math.rad(90),0,0)
+        hrp.CFrame = CFrame.new(startCF.X,fpdh+.25,startCF.Z) * (Character:FindFirstChild("Torso") and CFrame.Angles(math.rad(90),0,0) or CFrame.new())
     end)
-    task.wait(.25)
-    for i,v in pairs(allhats) do
-        v[1].Handle:BreakJoints()
-        local con;con=ps:Connect(function()
-            if not v[1]:FindFirstChild"Handle" then con:Disconnect() return end
-            v[1].Handle.Velocity = ((options.dontfling ~= true and v[2]:find("Toy")) and Vector3.new(99999,99999,99999)) or Vector3.new(20,20,20)
-            v[1].Handle.RotVelocity = Vector3.zero
-        end)
-    end
-    callback(allhats)
+    task.wait(.35)
+    callback(getAllHats(Character))
     Character.Humanoid:ChangeState(15)
-    torso.AncestryChanged:wait()
+	torso.AncestryChanged:Wait()
     for i,v in pairs(locks) do
         v:Disconnect()
     end
-    for i,v in pairs(allhats) do
-        sethiddenproperty(v[1],"BackendAccoutrementState",4)
+    for i,v in pairs(Character.Humanoid:GetAccessories()) do
+        sethiddenproperty(v,"BackendAccoutrementState",4)
     end
 end
 
@@ -160,8 +146,8 @@ end
 local cam = workspace.CurrentCamera
 
 game:GetService("StarterGui"):SetCore("VREnableControllerModels", false)
-
-input.UserCFrameChanged:connect(function(part,move)
+local rightarmalign = nil
+getgenv().con5 = input.UserCFrameChanged:connect(function(part,move)
     cam.CameraType = "Scriptable"
 	cam.HeadScale = options.headscale
     if part == Enum.UserCFrame.Head then
@@ -180,7 +166,7 @@ input.UserCFrameChanged:connect(function(part,move)
     end
 end)
 
-input.InputBegan:connect(function(key)
+getgenv().con4 = input.InputBegan:connect(function(key)
 	if key.KeyCode == options.thirdPersonButtonToggle then
 		thirdperson = not thirdperson -- disabled?
 	end
@@ -201,19 +187,33 @@ input.InputBegan:connect(function(key)
 		rfirst = false
         righttoyenable = not righttoyenable
     end
+    if key.KeyCode == Enum.KeyCode.ButtonR2 and rightarmalign~=nil then
+        R2down = true
+    end
 end)
 
-input.InputEnded:connect(function(key)
+getgenv().con3 = input.InputEnded:connect(function(key)
 	if key.KeyCode == Enum.KeyCode.ButtonR1 then
 		R1down = false
 	end
+    if key.KeyCode == Enum.KeyCode.ButtonR2 and rightarmalign~=nil then
+        R2down = false
+    end
 end)
-
-game:GetService("RunService").RenderStepped:connect(function()
+local negitive = true
+getgenv().con2 = game:GetService("RunService").RenderStepped:connect(function()
 	-- righthandpart.CFrame*CFrame.Angles(-math.rad(options.righthandrotoffset.X),-math.rad(options.righthandrotoffset.Y),math.rad(180-options.righthandrotoffset.X))
 	if R1down then
-		cam.CFrame = cam.CFrame:Lerp(cam.CoordinateFrame + (righthandpart.CFrame * CFrame.Angles(math.rad(options.controllerRotationOffset.X),math.rad(options.controllerRotationOffset.Y),math.rad(options.controllerRotationOffset.Z))).LookVector * cam.HeadScale/2, 0.5)
+		cam.CFrame = cam.CFrame:Lerp(cam.CoordinateFrame + (righthandpart.CFrame * CFrame.Angles(math.rad(options.righthandrotoffset.X),math.rad(options.righthandrotoffset.Y),math.rad(options.righthandrotoffset.Z)):Inverse() * CFrame.Angles(math.rad(options.controllerRotationOffset.X),math.rad(options.controllerRotationOffset.Y),math.rad(options.controllerRotationOffset.Z))).LookVector * cam.HeadScale/2, 0.5)
 	end
+    if R2down then
+        negitive=not negitive
+        rightarmalign:SetVelocity(Vector3.new(0,0,-99999999))
+        rightarmalign:SetCFrame(CFrame.Angles(math.rad(options.righthandrotoffset.X),math.rad(options.righthandrotoffset.Y),math.rad(options.righthandrotoffset.Z)):Inverse()*CFrame.new(0,0,8*(negitive and -1 or 1)))
+    else
+        rightarmalign:SetVelocity(Vector3.new(20,20,20))
+        rightarmalign:SetCFrame(CFrame.new(0,0,0))
+    end
 end)
 
 HatdropCallback(Player.Character, function(allhats)
@@ -221,18 +221,19 @@ HatdropCallback(Player.Character, function(allhats)
         if not v[1]:FindFirstChild("Handle") then continue end
         if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-        Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][v[3]])or CFrame.new())
+        local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
+        rightarmalign = v[2]=="right" and align or rightarmalign
     end
 end)
 
 getgenv().conn = Player.CharacterAdded:Connect(function(Character)
-    task.wait(0.35)
     HatdropCallback(Player.Character, function(allhats)
         for i,v in pairs(allhats) do
             if not v[1]:FindFirstChild("Handle") then continue end
             if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-            Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])])or CFrame.new())
+            local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
+            rightarmalign = v[2]=="right" and align or rightarmalign
         end
     end)
 end)
