@@ -1034,6 +1034,7 @@ for i,v in plr.Backpack:GetChildren() do
 	w:Destroy() 
 	v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
 	toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2))
+	v.Parent=plr.Backpack
 end
 plr.Character.ChildAdded:Connect(function(tool: Tool)
 	if tool:IsA("Tool") then
@@ -1090,6 +1091,7 @@ plr.CharacterAdded:Connect(function(char)
 		w:Destroy() 
 		v.Handle.CanQuery=false;v.Handle.CanCollide=false;v.Handle.CanTouch=false 
 		toolcons[v.Name] = Align(v.Handle,"RightArm",CFrame.Angles(math.pi/2,0,0)*CFrame.new(-1.5,1,0)*CFrame.Angles(0,-math.pi/2,-math.pi/2))
+		v.Parent=plr.Backpack
 	end
 	char.ChildAdded:Connect(function(tool: Tool)
 		if tool:IsA("Tool") then
