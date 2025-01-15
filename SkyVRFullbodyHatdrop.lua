@@ -202,7 +202,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
 	workspace.CurrentCamera.HeadScale=1
 	Camera.CFrame = oldcam
 	Players.LocalPlayer.CameraMaxZoomDistance = VRReady and 0.1 or 20
-	Players.LocalPlayer.CameraMinZoomDistance = 0.1
+	Players.LocalPlayer.CameraMinZoomDistance = 0
 end)
 
 Character.Humanoid.WalkSpeed = 0
@@ -1037,51 +1037,52 @@ function HatdropCallback(Character)
     Track:AdjustSpeed(0)
     local locks = {}
     for i,v in pairs(Character.Humanoid:GetAccessories()) do
-        table.insert(locks,v.Changed:Connect(function(p)
-            if p == "BackendAccoutrementState" then
-                sethiddenproperty(v,"BackendAccoutrementState",0)
+        table.insert(locks,v.Changed:Connect(function(th)
+            if th == "BackendAccoutrementState"then
+                sethiddenproperty(v,"BackendAccoutrementState",0);
             end
         end))
-        sethiddenproperty(v,"BackendAccoutrementState",0)
-    end
+        sethiddenproperty(v,"BackendAccoutrementState",0);
+    end;
     local c;c=game:GetService("RunService").PostSimulation:Connect(function()
         if(not Character:FindFirstChild("HumanoidRootPart"))then c:Disconnect()return;end
         
-        hrp.Velocity = Vector3.new(0,0,25)
-        hrp.RotVelocity = Vector3.new(0,0,0)
-        hrp.CFrame = CFrame.new(startCF.X,fpdh+.25,startCF.Z) * (Character:FindFirstChild("Torso") and CFrame.Angles(math.rad(90),0,0) or CFrame.new())
-    end)
-    task.wait(.3)
-	local alreadyfound = {}
+        hrp.Velocity = Vector3.new(0,0,25);
+        hrp.RotVelocity = Vector3.new(0,0,0);
+        hrp.CFrame = CFrame.new(startCF.X,fpdh+.25,startCF.Z) * (Character:FindFirstChild("Torso") and CFrame.Angles(math.rad(90),0,0) or CFrame.new());
+    end);
+    task.wait(.3);
+	local alreadyfound = {};
 	for i,v in pairs(Character.Humanoid:GetAccessories()) do
-		local handle = v:FindFirstChild("Handle") if not handle then continue end
-		local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
-		local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
-		alreadyfound[limbName]=true
-		handle.Transparency=getgenv().options.limbTransparency
-		if limbName=="Head" then handle.Transparency=1 end
-		if limbName=="Torso" then handle.Transparency=1 end
-		handle.CanQuery = false
-		handle.CanTouch = false
-		local hatattcf = handle:FindFirstChildOfClass("Attachment")
-		local headcf = VirtualRig:FindFirstChild(hatattcf.Name, true)
-		local washead=false
+		local handle = v:FindFirstChild("Handle") if not handle then continue end;
+		local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId);
+		local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound);
+		alreadyfound[limbName]=true;
+		handle.Transparency=getgenv().options.limbTransparency;
+		if limbName=="Head" then handle.Transparency=1 end;
+		if limbName=="Torso" then handle.Transparency=1 end;
+		handle.CanQuery = false;
+		handle.CanTouch = false;
+		local hatattcf = handle:FindFirstChildOfClass("Attachment");
+		local headcf = VirtualRig:FindFirstChild(hatattcf.Name, true);
+		local washead=false;
 		if limbName == "Head" then
 			for i,v in pairs(ExtraParts) do
-				if hatattcf.Name:find(i) then if limbName~=v then limbName = v washead=true break end end
+				if hatattcf.Name:find(i) then if limbName~=v then limbName = v washead=true break end end;
 			end
 		end
-		Align(handle, limbName, (((limbName == "Head") or washead) and (washead and CFrame.Angles(-math.pi/2,0,0)*headcf.CFrame*hatattcf.CFrame:Inverse() or headcf.CFrame*hatattcf.CFrame:Inverse())) or getgenv().accoffsets[limbName][index])
+		Align(handle, limbName, (((limbName == "Head") or washead) and (washead and CFrame.Angles(-math.pi/2,0,0)*headcf.CFrame*hatattcf.CFrame:Inverse() or headcf.CFrame*hatattcf.CFrame:Inverse())) or getgenv().accoffsets[limbName][index]);
 	end
-    Character.Humanoid.Health = 0
+    Character.Humanoid.Health = 0;
+	torso.AncestryChanged:Wait();
     for i,v in pairs(locks) do
-        v:Disconnect()
+        v:Disconnect();
     end
     for i,v in pairs(Character.Humanoid:GetAccessories()) do
-        sethiddenproperty(v,"BackendAccoutrementState",4)
+        sethiddenproperty(v,"BackendAccoutrementState",4);
     end
 end
 
-Script()
-HatdropCallback(plr.Character)
-plr.CharacterAdded:Connect(HatdropCallback)
+Script();
+HatdropCallback(plr.Character);
+plr.CharacterAdded:Connect(HatdropCallback);
