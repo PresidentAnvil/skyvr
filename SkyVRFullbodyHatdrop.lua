@@ -1025,7 +1025,7 @@ local ExtraParts = {
 
 function HatdropCallback(Character)
 	Character:WaitForChild("Humanoid")
-	task.wait(0.25)
+	task.wait(0.35)
     local AnimationInstance = Instance.new("Animation");AnimationInstance.AnimationId = "rbxassetid://35154961"
 	workspace.FallenPartsDestroyHeight = 0/0
     local hrp = Character.HumanoidRootPart
@@ -1058,13 +1058,6 @@ function HatdropCallback(Character)
 		local id = filterMeshID((handle:IsA("MeshPart") and handle.MeshId) or handle:FindFirstChildOfClass("SpecialMesh").MeshId)
 		local limbName, foundthroughmeshid, index = findMeshID(id,v.Name,alreadyfound)
 		alreadyfound[limbName]=true
-		if ("meshid:"..id)==getgenv().options.rightToy then
-			local a = Align(handle,(righttoypart),CFrame.new())
-			task.delay(0.5,function()
-				a:SetVelocity(Vector3.new(9999,9999,9999))
-			end)
-			continue
-		end
 		handle.Transparency=getgenv().options.limbTransparency
 		if limbName=="Head" then handle.Transparency=1 end
 		if limbName=="Torso" then handle.Transparency=1 end
@@ -1080,8 +1073,7 @@ function HatdropCallback(Character)
 		end
 		Align(handle, limbName, (((limbName == "Head") or washead) and (washead and CFrame.Angles(-math.pi/2,0,0)*headcf.CFrame*hatattcf.CFrame:Inverse() or headcf.CFrame*hatattcf.CFrame:Inverse())) or getgenv().accoffsets[limbName][index])
 	end
-    Character.Humanoid:ChangeState(15)
-	torso.AncestryChanged:Wait()
+    Character.Humanoid.Health = 0
     for i,v in pairs(locks) do
         v:Disconnect()
     end
