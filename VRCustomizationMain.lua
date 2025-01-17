@@ -719,8 +719,9 @@ repeat task.wait() until not Popup.Visible;
 ((global.skyvrsettings.fullbody and PreviewCharacter) or PreviewLimbs).Parent = Preview
 PreviewHatsFolder.Parent = Preview
 Preview.CurrentCamera = camera
+camera.Parent = workspace
 camera.CameraType = "Scriptable"
-camera.CFrame = CFrame.new(-28.55,4,8) * CFrame.Angles(0,math.pi,0)
+camera.CFrame = CFrame.new(-14.95, 10.8, -23.35) * CFrame.Angles(0,math.pi,0)
 camera.Focus = CFrame.new(0,0,0)
 camera.HeadLocked = true
 camera.DiagonalFieldOfView = 88.877
@@ -741,5 +742,5 @@ for i,v in ipairs(Tabs:GetChildren()) do
 end
 ExtraSettings.Selection2.hide.Visible = not global.skyvrsettings.fullbody
 Preview.Parent.Visible = true
-if Preview.Parent:FindFirstChild("blah") then Preview.Parent.blah.Visible = getgenv().fullbody end
+if Preview.Parent:FindFirstChild("blah") then Preview.Parent.blah.Visible = global.fullbody end
 updateList()
