@@ -823,7 +823,7 @@ ViewHUDFunc = function()
 	local Camera = workspace.CurrentCamera
 	 local CameraPort = Camera.CFrame
 	
-	local ViewHUD = script:FindFirstChild("ViewHUD") or game:GetObjects("rbxassetid://4649974000")[1]
+	local ViewHUD = game:GetObjects("rbxassetid://4649974000")[1]
 	 local Viewport = ViewHUD.Viewport
 	  local Viewcam = Instance.new("Camera")
 	 local ViewPart = ViewHUD.Part
