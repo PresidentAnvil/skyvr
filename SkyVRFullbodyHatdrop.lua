@@ -1,4 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/PresidentAnvil/HatdropReanimation/main/Valuable%20Dependencies/thething.lua"))()
 pcall(function()loader:Destroy()end)
 local fpdh = workspace.FallenPartsDestroyHeight
 local StudsOffset = 0.1
