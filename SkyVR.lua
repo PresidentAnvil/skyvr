@@ -1,7 +1,6 @@
 
 -- sky vr
 
-
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local ImageLabel = Instance.new("ImageLabel")
@@ -164,29 +163,15 @@ local ltoypos = CFrame.new(1.15,0,0) * CFrame.Angles(0,math.rad(180),0)
 local rtoypos = CFrame.new(1.15,0,0) * CFrame.Angles(0,math.rad(0),0)
 
 function Align(Part1,Part0,CFrameOffset) 
-    local AlignPos = Instance.new('AlignPosition', Part1);
-    AlignPos.Parent.CanCollide = false;
-    AlignPos.ApplyAtCenterOfMass = true;
-    AlignPos.MaxForce = 67752;
-    AlignPos.MaxVelocity = math.huge/9e110;
-    AlignPos.ReactionForceEnabled = false;
-    AlignPos.Responsiveness = 200;
-    AlignPos.RigidityEnabled = false;
-    local AlignOri = Instance.new('AlignOrientation', Part1);
-    AlignOri.MaxAngularVelocity = math.huge/9e110;
-    AlignOri.MaxTorque = 67752;
-    AlignOri.PrimaryAxisOnly = false;
-    AlignOri.ReactionTorqueEnabled = false;
-    AlignOri.Responsiveness = 200;
-    AlignOri.RigidityEnabled = false;
-    local AttachmentA=Instance.new('Attachment',Part1);
-    local AttachmentB=Instance.new('Attachment',Part0);
-    AttachmentB.CFrame = AttachmentB.CFrame * CFrameOffset
-    AlignPos.Attachment0 = AttachmentA;
-    AlignPos.Attachment1 = AttachmentB;
-    AlignOri.Attachment0 = AttachmentA;
-    AlignOri.Attachment1 = AttachmentB;
-    return {AttachmentB,AlignOri,AlignPos}
+    local con;con=game:GetService("RunService").PostSimulation:Connect(function()
+        if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
+        if not isnetworkowner(Part1) then return end
+        Part1.CanCollide=false;
+        Part1.CFrame=Part0.CFrame*CFrameOffset;
+        Part1.Velocity = Vector3.new(20,20,20) or getgenv().options.NetVelocity;
+    end)
+
+    return {}
 end
 
 
