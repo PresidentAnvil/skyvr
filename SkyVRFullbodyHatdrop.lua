@@ -969,8 +969,8 @@ end;
 
 local plr = game.Players.LocalPlayer
 
-function _isnetworkowner(Part)
-	return Part.ReceiveAge == 0
+_isnetworkowner = function(v)
+    return v.ReceiveAge == 0 and not v.NetworkIsSleeping
 end
 
 function Align(Part1,name,cf,velocity)

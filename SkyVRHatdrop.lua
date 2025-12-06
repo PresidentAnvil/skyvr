@@ -34,8 +34,8 @@ local parts = {
     leftToy=lefttoypart,
     rightToy=righttoypart,
 }
-function _isnetworkowner(Part)
-	return Part.ReceiveAge == 0
+_isnetworkowner = function(v)
+    return v.ReceiveAge == 0 and not v.NetworkIsSleeping
 end
 
 game.Workspace.FallenPartsDestroyHeight=0/0
