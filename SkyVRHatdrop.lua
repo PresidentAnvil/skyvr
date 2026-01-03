@@ -299,15 +299,18 @@ getgenv().con2 = game:GetService("RunService").RenderStepped:connect(function()
     end
 end)
 
-HatdropCallback(Player.Character, function(allhats)
-    for i,v in pairs(allhats) do
-        if not v[1]:FindFirstChild("Handle") then continue end
-        if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
-
-        local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
-        rightarmalign = v[2]=="right" and align or rightarmalign
-    end
+local s,e = pcall(function()
+	HatdropCallback(Player.Character, function(allhats)
+	    for i,v in pairs(allhats) do
+	        if not v[1]:FindFirstChild("Handle") then continue end
+	        if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
+	
+	        local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
+	        rightarmalign = v[2]=="right" and align or rightarmalign
+	    end
+	end)
 end)
+if not s then print(e)
 
 getgenv().conn = Player.CharacterAdded:Connect(function(Character)
     HatdropCallback(Player.Character, function(allhats)
