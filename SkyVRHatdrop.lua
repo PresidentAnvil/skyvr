@@ -310,7 +310,7 @@ local s,e = pcall(function()
 	    end
 	end)
 end)
-if not s then print(e)
+if not s then print(e) end
 
 getgenv().conn = Player.CharacterAdded:Connect(function(Character)
     HatdropCallback(Player.Character, function(allhats)
