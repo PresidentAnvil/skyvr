@@ -289,11 +289,11 @@ getgenv().con2 = game:GetService("RunService").RenderStepped:connect(function()
 	if R1down then
 		cam.CFrame = cam.CFrame:Lerp(cam.CoordinateFrame + (righthandpart.CFrame * CFrame.Angles(math.rad(options.righthandrotoffset.X),math.rad(options.righthandrotoffset.Y),math.rad(options.righthandrotoffset.Z)):Inverse() * CFrame.Angles(math.rad(options.controllerRotationOffset.X),math.rad(options.controllerRotationOffset.Y),math.rad(options.controllerRotationOffset.Z))).LookVector * cam.HeadScale/2, 0.5)
 	end
-    if R2down then
+    if R2down and rightarmalign then
         negitive=not negitive
         rightarmalign:SetVelocity(Vector3.new(0,0,-99999999))
         rightarmalign:SetCFrame(CFrame.Angles(math.rad(options.righthandrotoffset.X),math.rad(options.righthandrotoffset.Y),math.rad(options.righthandrotoffset.Z)):Inverse()*CFrame.new(0,0,8*(negitive and -1 or 1)))
-    else
+    elseif rightarmalign then
         rightarmalign:SetVelocity(Vector3.new(20,20,20))
         rightarmalign:SetCFrame(CFrame.new(0,0,0))
     end
