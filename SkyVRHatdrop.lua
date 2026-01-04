@@ -213,7 +213,6 @@ function HatdropCallback(c, callback)
 	                    --han.AssemblyAngularVelocity = Vector3.new(9e9, 0, 9e9)
 	                    --han.CFrame = old
 	                end)
-	                han:GetPropertyChangedSignal("CanCollide"):Wait()
 	            end
 	        end
 	    end)()
