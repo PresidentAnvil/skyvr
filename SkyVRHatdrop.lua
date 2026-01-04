@@ -220,7 +220,7 @@ function HatdropCallback(c, callback)
 	    task.wait(0.4)
 	    con:Disconnect()
 	    con = nil
-	    callback(getAllHats(Character))
+	    callback(getAllHats(c))
 	    hum:ChangeState(15)
 	end
 end
