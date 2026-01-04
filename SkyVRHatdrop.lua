@@ -211,7 +211,7 @@ function HatdropCallback(c, callback)
 	                con = runservice.PostSimulation:Connect(function()
 	                    han.AssemblyLinearVelocity = Vector3.new(0, 30, 0)
 	                    --han.AssemblyAngularVelocity = Vector3.new(9e9, 0, 9e9)
-	                    han.CFrame = old
+	                    --han.CFrame = old
 	                end)
 	                han:GetPropertyChangedSignal("CanCollide"):Wait()
 	            end
