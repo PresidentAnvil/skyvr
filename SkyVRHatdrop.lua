@@ -68,6 +68,7 @@ end
 
 function Align(Part1,Part0,cf,isflingpart) 
     local up = isflingpart
+	setscriptable(Part1,"NetworkIsSleeping",true)
     local con;con=ps:Connect(function()
         if up~=nil then up=not up end
         if not Part1:IsDescendantOf(workspace) then con:Disconnect() return end
