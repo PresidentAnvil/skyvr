@@ -35,7 +35,14 @@ local parts = {
     rightToy=righttoypart,
 }
 _isnetworkowner = function(v)
-    return v.ReceiveAge == 0 and not gethiddenproperty(v,"NetworkIsSleeping")
+    local success, result = pcall(function()
+        return v.ReceiveAge == 0 and not v.NetworkIsSleeping
+    end)
+    if success then
+        return result
+    else
+        return v.ReceiveAge
+    end
 end
 
 game.Workspace.FallenPartsDestroyHeight=0/0
