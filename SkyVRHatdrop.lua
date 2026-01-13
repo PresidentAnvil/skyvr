@@ -166,69 +166,45 @@ local function fullbreakvel(instance)
 	end
 end
 
-function HatdropCallback(c, callback)
-	ws = game:GetService("Workspace")
-	G = ((getgenv and getgenv()) or _G)
-	if not G.fpdh then
-	    G.fpdh = ws.FallenPartsDestroyHeight
-	end
-	fpdh = G.fpdh or ws.FallenPartsDestroyHeight
-	runservice = game:GetService("RunService")
-	players = game:GetService("Players")
-	p = players.LocalPlayer
-	ws.FallenPartsDestroyHeight = 0/0
-	local hum = c:WaitForChild("Humanoid")
-	local hrp = c:WaitForChild("HumanoidRootPart")
-	local head = c:WaitForChild("Head")
-	if hum and hrp and head then
-	    local r6 = hum.RigType == Enum.HumanoidRigType.R6
-	    if r6 then
-	        local anim = Instance.new("Animation")
-	        anim.AnimationId = "rbxassetid://35154961"
-	        local loadanim = hum:LoadAnimation(anim)
-	        loadanim:Play(0, 100, 0)
-	        loadanim.TimePosition = 3.24
-	    end
-	    hum:ChangeState(Enum.HumanoidStateType.Physics)
-	    local old = hrp.CFrame
-	    fullbreakvel(hrp)
-	    local cf = r6 and CFrame.new(hrp.CFrame.Position.X, fpdh + 1, hrp.CFrame.Position.Z) * CFrame.Angles(math.rad(90), 0, 0) or CFrame.new(hrp.CFrame.Position.X, fpdh + 1, hrp.CFrame.Position.Z)
-	    hrp.CFrame = cf
-	    local con
-	    con = runservice.PostSimulation:Connect(function()
-	        fullbreakvel(hrp)
-	        hrp.CFrame = cf
-	    end)
-	    coroutine.wrap(function()
-	        for i, v in hum:GetAccessories() do
-	            local han = v:FindFirstChild("Handle")
-	            local weld = han and han:FindFirstChildWhichIsA("Weld")
-	            if weld then
-	                sethiddenproperty(v, "BackendAccoutrementState", 0)
-	                local a = Instance.new("SelectionBox")
-	                a.LineThickness = 0.15000000596046448 * han.Size.Y/50
-	                a.Adornee = han
-	                a.Parent = han
-	                --weld:GetPropertyChangedSignal("Parent"):Wait()
-	                han:BreakJoints()
-	                han.AssemblyLinearVelocity = Vector3.new(0, 30, 0)
-	                --han.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-	                han.CFrame = old * CFrame.new(0, han.Size.Y/2, 0)
-	                local con
-	                con = runservice.PostSimulation:Connect(function()
-	                    han.AssemblyLinearVelocity = Vector3.new(0, 30, 0)
-	                    --han.AssemblyAngularVelocity = Vector3.new(9e9, 0, 9e9)
-	                    --han.CFrame = old
-	                end)
-	            end
-	        end
-	    end)()
-	    task.wait(0.4)
-	    con:Disconnect()
-	    con = nil
-	    callback(getAllHats(c))
-	    hum:ChangeState(15)
-	end
+function HatdropCallback(Character, callback)
+    Character:WaitForChild("Humanoid")
+    Character:WaitForChild("HumanoidRootPart")
+	task.wait(0.4)
+    local AnimationInstance = Instance.new("Animation");AnimationInstance.AnimationId = "rbxassetid://35154961"
+	workspace.FallenPartsDestroyHeight = 0/0
+    local hrp = Character.HumanoidRootPart
+    local startCF = Character.HumanoidRootPart.CFrame
+	local torso = Character:FindFirstChild("Torso") or Character:FindFirstChild("LowerTorso")
+    local Track = Character.Humanoid.Animator:LoadAnimation(AnimationInstance)
+    Track:Play()
+    Track.TimePosition = 3.24
+    Track:AdjustSpeed(0)
+    local locks = {}
+    for i,v in pairs(Character.Humanoid:GetAccessories()) do
+        table.insert(locks,v.Changed:Connect(function(p)
+            if p == "BackendAccoutrementState" then
+                sethiddenproperty(v,"BackendAccoutrementState",0)
+            end
+        end))
+        sethiddenproperty(v,"BackendAccoutrementState",2)
+    end
+    local c;c=game:GetService("RunService").PostSimulation:Connect(function()
+        if(not Character:FindFirstChild("HumanoidRootPart"))then c:Disconnect()return;end
+        
+        hrp.Velocity = Vector3.new(0,0,25)
+        hrp.RotVelocity = Vector3.new(0,0,0)
+        hrp.CFrame = CFrame.new(startCF.X,fpdh+.25,startCF.Z) * (Character:FindFirstChild("Torso") and CFrame.Angles(math.rad(90),0,0) or CFrame.new())
+    end)
+    task.wait(.35)
+    callback(getAllHats(Character))
+    Character.Humanoid:ChangeState(15)
+	torso.AncestryChanged:Wait()
+    for i,v in pairs(locks) do
+        v:Disconnect()
+    end
+    for i,v in pairs(Character.Humanoid:GetAccessories()) do
+        sethiddenproperty(v,"BackendAccoutrementState",4)
+    end
 end
 
 
