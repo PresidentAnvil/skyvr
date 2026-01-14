@@ -2,7 +2,14 @@
 -- sky vr
 
 isnetworkowner = function(v)
-    return v.ReceiveAge == 0 and not v.NetworkIsSleeping
+    local success, result = pcall(function()
+        return v.ReceiveAge == 0 and not v.NetworkIsSleeping
+    end)
+    if success then
+        return result
+    else
+        return v.ReceiveAge
+    end
 end
 
 local loader = Instance.new("ScreenGui")
